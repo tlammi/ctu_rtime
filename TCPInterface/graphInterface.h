@@ -1,23 +1,48 @@
+/**
+   \brief Contains data for HTML graph
+
+   Data is stored in ring buffer and oldest
+   value is dropped once newer value is added
+*/
 #ifndef GRAPHINTERFACE_H
 #define GRAPHINTERFACE_H
 
-
+/**
+   \brief Structure for containing graph data
+*/
 typedef struct{
-    int actPos;
-    int reqPos;
-    int pwmDuty;
+    int actPos; //! Actual motor position
+    int reqPos; //! Requested motor position
+    int pwmDuty; //! PWM duty cycle
 } GraphData;
 
-typedef enum{
-    ACT_POS = 1,
-    REQ_POS,
-    PWM_DUTY
-} GRAPH_TYPE;
 
+/**
+   \brief Pushes new data into database
 
-void pushData(GraphData data);
+   When new data is pushed into database,
+   the oldest value is overwritten
 
-int getTraceDataStr(char* actPosBuff,
+   \param data - data to be added
+*/
+void pushGraphData(GraphData data);
+
+/**
+   \brief Get strings from database
+
+   Returns database values used by TCP interface for producing plots
+   into HTML.
+   E.g. if stored actual position values are 
+   1,2,3,4,5,6,7 and 8 as integers, then actPosBuff would contain string
+   "[1,2,3,4,5,6,7,8]". This is easy to add into HTML string.
+   
+   \param actPosBuff - Actual position string buffer
+   \param reqPosBuff - Required position string buffer
+   \param pwmDutyBuff - PWM duty cycle string buffer
+   
+   \return 0
+*/
+int getGraphDataStr(char* actPosBuff,
 		    char* reqPosBuff, char* pwmDutyBuff);
 
 

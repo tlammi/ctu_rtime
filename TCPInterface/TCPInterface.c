@@ -84,7 +84,7 @@ const char* HTML_FORMAT = HTTP_HEADER
 
 
 
-TCPHandle initTCP(){
+TCPHandle TCP_init(){
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     int portNo = 1982;
@@ -120,7 +120,7 @@ error:
 }
 
 
-TCPHandle listenTCP(TCPHandle initialiHandl){
+TCPHandle TCP_listen(TCPHandle initialiHandl){
     listen((int)initialiHandl, MAX_CONNECTIONS);
     struct sockaddr_in cliAddr;
     int cliLen = sizeof(cliAddr);
@@ -139,7 +139,7 @@ error:
 }
 
 char gBuffer[256];
-int readAndAnswer(TCPHandle cliHandl){
+int TCP_answerToClient(TCPHandle cliHandl){
 
     int i=0;
 
@@ -147,7 +147,7 @@ int readAndAnswer(TCPHandle cliHandl){
     char reqPosBuff[100];
     char pwmBuff[100];
 
-    getTraceDataStr(actPosBuff, reqPosBuff, pwmBuff);
+    getGraphDataStr(actPosBuff, reqPosBuff, pwmBuff);
     
     char sendBuffer[1024*1024];
     
@@ -160,15 +160,15 @@ int readAndAnswer(TCPHandle cliHandl){
 }
 
 
-void pushGraphData(GraphData data){
-    pushData(data);
+void TCP_pushGraphData(GraphData data){
+    pushGraphData(data);
 }
 
-void closeTCPServer(TCPHandle servHandl){
+void TCP_closeTCPServer(TCPHandle servHandl){
     close((int) servHandl);
 }
 
 
-void closeClientConnection(TCPHandle cliHandl){
+void TCP_closeClientConnection(TCPHandle cliHandl){
     close((int) cliHandl); 
 }

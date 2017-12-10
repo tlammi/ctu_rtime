@@ -12,12 +12,12 @@ static GraphData gData[RING_BUFFER_SIZE];
 // Write index
 static unsigned gWIndex;
 
-void pushData(GraphData data){
+void pushGraphData(GraphData data){
     gData[gWIndex] = data;
     gWIndex = (gWIndex+1)%RING_BUFFER_SIZE;
 }
 
-int getTraceDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
+int getGraphDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
 
     strcpy(actPosBuff, "[");
     strcpy(reqPosBuff, "[");

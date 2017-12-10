@@ -7,7 +7,7 @@ int main(){
 
     srand(0);
 
-    TCPHandle myHandl = initTCP();
+    TCPHandle myHandl = TCP_init();
     int iterations = 0;
     TCPHandle cliHandl;
     while(iterations < 10){
@@ -17,14 +17,14 @@ int main(){
 	    .pwmDuty = rand()%10
 	};
 
-	pushGraphData(data);
+	TCP_pushGraphData(data);
 	
-	cliHandl = listenTCP(myHandl);
-	int result = readAndAnswer(cliHandl);
-	closeClientConnection(cliHandl);
+	cliHandl = TCP_listen(myHandl);
+	int result = TCP_answerToClient(cliHandl);
+	TCP_closeClientConnection(cliHandl);
 	++iterations;
     }
-    closeClientConnection(cliHandl);
+    TCP_closeClientConnection(cliHandl);
 
     exit(0);
 }

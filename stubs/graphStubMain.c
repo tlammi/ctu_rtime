@@ -27,7 +27,7 @@ int main(){
 	};
 	datas[i%8] = data;
 
-	pushData(data);
+	pushGraphData(data);
 
 	// Buffer is full -> test
 	if(i%8 == 7){
@@ -39,10 +39,11 @@ int main(){
 	    }
 	    i2 = 0;
 	    printf("From interface:\n");
-	    getTraceDataStr(actPosBuff, reqPosBuff, pwmBuff);
+	    getGraphDataStr(actPosBuff, reqPosBuff, pwmBuff);
 
 	    printf("%s\n%s\n%s\n",actPosBuff, reqPosBuff, pwmBuff);
 
+	    // For easier data inspection
 	    char c;
 	    c = getchar();
 	}
