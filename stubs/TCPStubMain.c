@@ -10,7 +10,7 @@ int main(){
     TCPHandle myHandl = TCP_init();
     int iterations = 0;
     TCPHandle cliHandl;
-    while(iterations < 10){
+    while(1){
 	GraphData data = {
 	    .actPos = rand()%10,
 	    .reqPos = rand()%10,

@@ -1,4 +1,5 @@
 #include "TCPInterface.h"
+#include "graphInterface.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,12 +21,13 @@
     "<script src=\"https://cdn.plot.ly/plotly-latest.min.js\">" \
     "</script>""</head>"
 
-#define GRAPH_WIDTH_PX 2000
-#define GRAPH_HEIGHT_PX 1000
+#define GRAPH_WIDTH_PX "1000"
+#define GRAPH_HEIGHT_PX "500"
 // Place holder for the plot
-#define HTML_BODY "<body>"\
-    "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX \
-    "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"	       \
+#define HTML_BODY "<body onload"				\
+    "=\"setTimeout(function(){location.reload()}, 100);\">"	\
+    "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX		\
+    "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
     "</body>"
 
 // Plotly.plot(<place holder>, <data>, <layout>)
@@ -54,7 +56,7 @@
     "};"						\
     "var data = [trace1, trace2, trace3];"		\
     "var layout = {"					\
-    "title: 'System Information',"				\
+    "title: 'System Information',"			\
     "xaxis: {"						\
     "title: 'x Axis',"					\
     "titlefont: {"					\
@@ -75,6 +77,7 @@
     "Plotly.plot(TESTER, data, layout)"			\
     "</script>"
 
+//! Full HTML string format
 const char* HTML_FORMAT = HTTP_HEADER
     "<!DOCTYPE html>""<html>"
     HTML_HEAD
@@ -96,7 +99,6 @@ TCPHandle TCP_init(){
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(portNo);
 
-    printf("Before bind\n");
     char *bind_address = "127.0.0.1";
     if (inet_aton(bind_address, &myAddr.sin_addr) == 0) {
 	printf("invalid bind address\n");
@@ -105,7 +107,6 @@ TCPHandle TCP_init(){
 
     int status = bind(sockfd, (struct sockaddr*)&myAddr,
 		      sizeof(myAddr));
-    printf("after bind\n");
     if(status < 0){
 	perror("bind");
 	goto error;
@@ -143,18 +144,34 @@ int TCP_answerToClient(TCPHandle cliHandl){
 
     int i=0;
 
-    char actPosBuff[100];
-    char reqPosBuff[100];
-    char pwmBuff[100];
+    char actPosBuff[100]; // Actual postion buffer
+    char reqPosBuff[100]; // Requested position buffer
+    char pwmBuff[100];    // PWM duty cycle buffer
 
+    // Import data from graphInterface
     getGraphDataStr(actPosBuff, reqPosBuff, pwmBuff);
-    
-    char sendBuffer[1024*1024];
-    
+
+    // Message is stored in this
+    char sendBuffer[1024*10];
+
+    // Construct message
     sprintf(sendBuffer, HTML_FORMAT, actPosBuff, reqPosBuff, pwmBuff);
 
-    int msgSize = write((int) cliHandl, sendBuffer, strlen(sendBuffer));
-    printf("sent: %s\n",sendBuffer);
+    // Send the data
+    int toBeSent = strlen(sendBuffer);
+    int strLen = toBeSent;
+    int msgSize;
+    while(toBeSent > 0){
+	msgSize = write((int) cliHandl, sendBuffer,
+			strLen);
+	if(msgSize >= 0){
+	    toBeSent -= msgSize;
+	}
+	else{
+	    printf("TCP error: write returned %d",msgSize);
+	    return -1;
+	}
+    }
 
     return 0;
 }

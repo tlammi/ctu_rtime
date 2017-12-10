@@ -8,7 +8,7 @@
 #define TCPINTERFACE_H
 
 
-#include "graphInterface.h"
+#include "graphInterfaceTypes.h"
 
 
 //! Handle to interface
