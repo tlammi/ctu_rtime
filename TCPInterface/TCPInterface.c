@@ -8,9 +8,11 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 // Max num of concurrent HTTP connections
 #define MAX_CONNECTIONS 5
+
 
 // Some magic words sent via HTTP
 #define HTTP_HEADER "HTTP/1.0 200 OK\r\n" \
@@ -88,9 +90,10 @@ const char* HTML_FORMAT = HTTP_HEADER
 
 
 TCPHandle TCP_init(){
+    // Socket file
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    int portNo = 1982;
+    
+    int portNo = TCP_PORT;
 
     struct sockaddr_in myAddr;
     bzero((char*)&myAddr, sizeof(myAddr));
@@ -112,17 +115,17 @@ TCPHandle TCP_init(){
 	goto error;
     }
 
-    return (TCPHandle) sockfd;
+    return sockfd;
 
 
 error:
     close(sockfd);
-    return (TCPHandle) (-1);
+    return -1;
 }
 
 
 TCPHandle TCP_listen(TCPHandle initialiHandl){
-    listen((int)initialiHandl, MAX_CONNECTIONS);
+    listen(initialiHandl, MAX_CONNECTIONS);
     struct sockaddr_in cliAddr;
     int cliLen = sizeof(cliAddr);
     int cliSockfd = accept((int)initialiHandl,
@@ -133,10 +136,10 @@ TCPHandle TCP_listen(TCPHandle initialiHandl){
 	goto error;
     }
 
-    return (TCPHandle) cliSockfd;
+    return cliSockfd;
 
 error:
-    return (TCPHandle) (-1);
+    return -1;
 }
 
 char gBuffer[256];
@@ -162,7 +165,7 @@ int TCP_answerToClient(TCPHandle cliHandl){
     int strLen = toBeSent;
     int msgSize;
     while(toBeSent > 0){
-	msgSize = write((int) cliHandl, sendBuffer,
+	msgSize = write(cliHandl, sendBuffer,
 			strLen);
 	if(msgSize >= 0){
 	    toBeSent -= msgSize;
@@ -181,11 +184,6 @@ void TCP_pushGraphData(GraphData data){
     pushGraphData(data);
 }
 
-void TCP_closeTCPServer(TCPHandle servHandl){
-    close((int) servHandl);
-}
-
-
-void TCP_closeClientConnection(TCPHandle cliHandl){
-    close((int) cliHandl); 
+void TCP_closeInterface(TCPHandle interfaceHandl){
+    close(interfaceHandl);
 }

@@ -11,8 +11,10 @@
 #include "graphInterfaceTypes.h"
 
 
+#define TCP_PORT 1982
+
 //! Handle to interface
-typedef void* TCPHandle;
+typedef int TCPHandle;
 
 
 
@@ -21,7 +23,7 @@ typedef void* TCPHandle;
 
    Initializes the OS interface and returns a handle to interface
 
-   \ret TCPHandle - handle to interface
+   \ret TCPHandle - handle to interface, -1 upon failure
 
  */
 TCPHandle TCP_init();
@@ -31,7 +33,7 @@ TCPHandle TCP_init();
    \brief Listens for new connections
 
    \param handl - Handle to interface initialized in initTCP()-function
-   \ret - Handle to interface used in communicating with client (different than the one gotten from initTCP()
+   \ret - Handle to interface used in communicating with client (different than the one gotten from initTCP(), -1 upon failure
 */
 TCPHandle TCP_listen(TCPHandle handl);
 
@@ -41,7 +43,7 @@ TCPHandle TCP_listen(TCPHandle handl);
 
    \param cliHandl - handle to client interface gotten from listenTCP() function
 
-   \return 0
+   \return 0 upon success, -1 otherwise
 */
 int TCP_answerToClient(TCPHandle cliHandl);
 
@@ -55,17 +57,11 @@ int TCP_answerToClient(TCPHandle cliHandl);
 void TCP_pushGraphData(GraphData data);
 
 /**
-   \brief Close TCP server
-   TODO: combine with closeClientConnection() because the same
+   \brief Close TCP interface (socket)
 
    \param servHandl - closes the interface pointed by this handle
 */
-void TCP_closeTCPServer(TCPHandle servHandl);
+void TCP_closeInterface(TCPHandle interfaceHandl);
 
-
-/**
-   \brief same as closeTCPServer()
-*/
-void TCP_closeClientConnection(TCPHandle cliHandl);
 
 #endif

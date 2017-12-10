@@ -21,10 +21,9 @@ int main(){
 	
 	cliHandl = TCP_listen(myHandl);
 	int result = TCP_answerToClient(cliHandl);
-	TCP_closeClientConnection(cliHandl);
+	TCP_closeInterface(cliHandl);
 	++iterations;
     }
-    TCP_closeClientConnection(cliHandl);
 
     exit(0);
 }
