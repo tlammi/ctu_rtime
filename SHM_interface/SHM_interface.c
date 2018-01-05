@@ -1,5 +1,4 @@
 #include "SHM_interface.h"
-#include "cRingBuffer.c"
 
 #include <sys/mman.h>
 #include <unistd.h>
@@ -42,7 +41,7 @@
 
 
 //! Object for data in shared memory
-static struct RingBufferObject{
+struct RingBufferObject{
     SHM_BUFFER_DATATYPE data[SHM_DATA_SIZE]; //!< Actual data
     size_t rIndex; //!< Metadata: read index
     size_t dataCount; //!< Metadata: count of data in the buffer
@@ -180,7 +179,7 @@ static const char* getSharedSemName(SHM_ID shmId){
 
 
 //! Shared memory objects are stored here
-ShmObject gSHMObjects[5];
+struct ShmObject gSHMObjects[5];
 
 
 shmHandl SHM_init(SHM_ID shmId){
@@ -189,16 +188,16 @@ shmHandl SHM_init(SHM_ID shmId){
     printf("Beginning of init\n");
 
     const char* sMutexName = getSharedMutexName(shmId);
+    const char* sSemName = getSharedSemName(shmId);
+    const char* shmName = getShmName(shmId);
     if(sMutexName == NULL){
 	perror("getSharedMutexName");
 	goto error;
     }
-    const char* sSemName = getSharedSemName(shmId);
     if(sSemName == NULL){
 	perror("getSharedSemName");
 	goto error;
     }
-    const char* shmName = getShmName(shmId);
     if(shmName == NULL){
 	perror("getShmName");
 	goto error;
@@ -214,12 +213,12 @@ shmHandl SHM_init(SHM_ID shmId){
 					 NULL);
 
     gSHMObjects[shmId-1].sem = semOpen(sSemName,
-				       SEM_TYPE_SEMAPHORE,
-				       SEM_EMPTY,
-				       SEM_Q_FIFO,
-				       OM_CREATE,
-				       NULL);
-    
+    		SEM_TYPE_BINARY,
+    		SEM_EMPTY,
+    		SEM_Q_FIFO,
+    		OM_CREATE,
+    		NULL);
+
     // This is for closing shared memory
     gSHMObjects[shmId-1].shmName = shmName;
     
@@ -249,8 +248,8 @@ shmHandl SHM_init(SHM_ID shmId){
 				       sizeof(struct RingBufferObject),
 				       PROT_READ | PROT_WRITE,
 				       MAP_SHARED, fd, 0);
-    printf("address of the memory: %lx\n",
-	   (long int) gSHMObjects[shmId-1]);
+    //printf("address of the memory: %lx\n",
+	//   (long int) gSHMObjects[shmId-1]);
 
     if(gSHMObjects[shmId-1].obj == (struct RingBufferObject*)MAP_FAILED){
 	perror("mmap");
@@ -264,18 +263,16 @@ shmHandl SHM_init(SHM_ID shmId){
 
     close(fd);
 
-    printf("data0: %d\n", gSHMObjects[shmId-1]->data[0]);
-    printf("wIndex: %lu\n",gSHMObjects[shmId-1]->wIndex);
 
     
 
-    return (shmHandl) gSHMObjects[shmId-1];
+    return ((shmHandl) &gSHMObjects[shmId-1]);
 error:
     return NULL;
 }
 
 
-size_t SHM_push(shmHandl handl, int* data, size_t count){
+size_t SHM_push(shmHandl handl, SHM_BUFFER_DATATYPE* data, size_t count){
 
     struct ShmObject* ptr = (struct ShmObject*) handl;
 
@@ -302,7 +299,7 @@ size_t SHM_push(shmHandl handl, int* data, size_t count){
     
     semGive(ptr->mutex);
 
-    ringBufferPush(ptr->obj, data, writeCount);
+    ringBufferPush(ptr->obj, startIndex, data, writeCount);
 
     // TODO: add semaphore check and give
 
@@ -310,8 +307,8 @@ size_t SHM_push(shmHandl handl, int* data, size_t count){
 }
 
 
-int SHM_pop(shmHandl handl, int* buffer, int maxBytes){
-    struct shmObject* ptr = (struct shmObject*) handl;
+int SHM_pop(shmHandl handl, SHM_BUFFER_DATATYPE* buffer, size_t maxBytes){
+    struct ShmObject* ptr = (struct ShmObject*) handl;
 
     /*
       Alogrithm:
