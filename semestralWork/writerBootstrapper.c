@@ -12,7 +12,6 @@ void init(FifoHandl* motorHandl, FifoHandl* tcpHandl){
 	*tcpHandl = fifo_init(FIFO_TCP_SERVER);
 }
 
-
 void writerBootstrap(){
 	FifoHandl motorHandl, tcpHandl;
 	init(&motorHandl, &tcpHandl);
