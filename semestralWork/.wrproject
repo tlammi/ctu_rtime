@@ -6894,6 +6894,7 @@
                 <file name="/semestralWork/readerBootstrapper.c"/>
                 <folder name="/semestralWork/udpClientTask" recursive="true"/>
                 <folder name="/semestralWork/motorReaderTask" recursive="true"/>
+                <folder name="/semestralWork/fifoBuffer" recursive="true"/>
             </contents>
         </buildtarget>
         <buildtarget buildtool="Linker" name="motorWriter" passed="false" targetname="motorWriter">

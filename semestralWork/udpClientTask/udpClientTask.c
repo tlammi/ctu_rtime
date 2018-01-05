@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <time.h>
 #include <taskLib.h>
+#include <inetLib.h>
+#include <sockLib.h>
 
 
 static int initSocket(){
@@ -56,6 +58,6 @@ void udpClientTask(FifoHandl fifoHandl){
 	
 	while(1){
 		value = fifo_pop(fifoHandl);
-		int n = sendto(sockd, &value, 1, 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
+		int n = sendto(sockd, &val, 1, 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
 	}
 }
