@@ -791,6 +791,7 @@
             <stringAttribute key="BLD::Info|Macro|LIBS|value|ARMARCH7diab_SMP" value=""/>
             <listAttribute key="BLD::Info|Incl|ARMARCH7diab_SMP">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-I$(WIND_BASE)/target/config/xlnx_zynq7k"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Definess|ARMARCH7diab_SMP">
