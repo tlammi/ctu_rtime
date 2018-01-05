@@ -5,7 +5,7 @@
 
 
 int init(){
-	
+	startMotorWriter();
 }
 
 
