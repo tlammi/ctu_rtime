@@ -58,6 +58,6 @@ void udpClientTask(FifoHandl fifoHandl){
 	
 	while(1){
 		value = fifo_pop(fifoHandl);
-		int n = sendto(sockd, &val, 1, 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
+		int n = sendto(sockd, &value, sizeof(int), 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
 	}
 }
