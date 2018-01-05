@@ -9,6 +9,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <inetLib.h>
+#include <sockLib.h>
+
 
 // Max num of concurrent HTTP connections
 #define MAX_CONNECTIONS 5
@@ -27,7 +30,7 @@
 #define GRAPH_HEIGHT_PX "500"
 // Place holder for the plot
 #define HTML_BODY "<body onload"				\
-    "=\"setTimeout(function(){location.reload()}, 100);\">"	\
+    "=\"setInterval(function(){location.reload()}, 5000);\">"	\
     "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX		\
     "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
     "</body>"
@@ -92,7 +95,7 @@ const char* HTML_FORMAT = HTTP_HEADER
 TCPHandle TCP_init(){
     // Socket file
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    
+    printf("sockfd was: %d\n",sockfd);
     int portNo = TCP_PORT;
 
     struct sockaddr_in myAddr;
@@ -102,10 +105,12 @@ TCPHandle TCP_init(){
     myAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     myAddr.sin_port = htons(portNo);
 
-    char *bind_address = "127.0.0.1";
+    char *bind_address = TCP_SERVER_ADDR;
+    
+    // For some reason this call fails but the server still works
     if (inet_aton(bind_address, &myAddr.sin_addr) == 0) {
-	printf("invalid bind address\n");
-	goto error;
+    	perror("invalid bind address\n");
+    	//goto error;
     }
 
     int status = bind(sockfd, (struct sockaddr*)&myAddr,
@@ -125,6 +130,7 @@ error:
 
 
 TCPHandle TCP_listen(TCPHandle initialiHandl){
+	printf("beginning of TCP_listen\n");
     listen(initialiHandl, MAX_CONNECTIONS);
     struct sockaddr_in cliAddr;
     int cliLen = sizeof(cliAddr);

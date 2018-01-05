@@ -2,7 +2,7 @@
 #define TCPSERVERTASK_H
 
 
-void tcpServetTask();
+void tcpServerTask();
 
 
 #endif

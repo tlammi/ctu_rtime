@@ -791,8 +791,16 @@
             <stringAttribute key="BLD::Info|Macro|LIBS|value|ARMARCH7diab_SMP" value=""/>
             <listAttribute key="BLD::Info|Incl|ARMARCH7diab_SMP">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
-                <stringAttribute value="-I$(WIND_BASE)/target/config/xlnx_zynq7k"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
+                <stringAttribute value="-I$(WIND_BASE)/target/config/xlnx_zynq7k"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/udpServerTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/udpClientTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/tcpServerTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/tcpServerTask/TCPInterface"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/motorWriterTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/motorReaderTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/fifoBuffer"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Definess|ARMARCH7diab_SMP">
                 <stringAttribute value="-DCPU=_VX_$(CPU)"/>
@@ -2548,6 +2556,7 @@
             <stringAttribute key="BLD::Info|Macro|LIBS|value|SIMLINUXdiab" value=""/>
             <listAttribute key="BLD::Info|Incl|SIMLINUXdiab">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-I$(WIND_BASE)/target/config/xlnx_zynq7k"/>
                 <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/tcpServerTask/TCPInterface"/>
                 <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork"/>
                 <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/udpClientTask"/>

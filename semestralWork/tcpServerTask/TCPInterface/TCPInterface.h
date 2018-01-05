@@ -12,6 +12,7 @@
 
 
 #define TCP_PORT 1982
+#define TCP_SERVER_ADDR "192.168.202.207"
 
 //! Handle to interface
 typedef int TCPHandle;

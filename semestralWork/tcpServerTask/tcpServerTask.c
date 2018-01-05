@@ -3,17 +3,20 @@
 #include "TCPInterface.h"
 
 #include <stdlib.h>
-
+#include <taskLib.h>
+#include <kernelLib.h>
 
 
 static void graphUpdaterTask(){
-
-	GraphData data;
-	data.actPos = rand();
-	data.pwmDuty = rand();
-	data.reqPos = rand();
-	
-	TCP_pushGraphData(data);
+	while(1){
+		GraphData data;
+		data.actPos = rand();
+		data.pwmDuty = rand();
+		data.reqPos = rand();
+		printf("%d\n",data.actPos);
+		TCP_pushGraphData(data);
+		taskDelay(500);
+	}
 }
 
 void tcpServerTask(){
@@ -21,7 +24,15 @@ void tcpServerTask(){
 	// TODO: spawn the graphUpdaterTask
 	
 	srand(0);
+	
+
+	taskSpawn("graphUpdater", 210, 0, 4096, (FUNCPTR) 	graphUpdaterTask, 0,0,0,0,0,0,0,0,0,0);
+	
 	TCPHandle handl = TCP_init();
+	while(handl == -1){
+		handl = TCP_init();
+		taskDelay(500);
+	}
 	TCPHandle cliHandl;
 	
 	while(1){
