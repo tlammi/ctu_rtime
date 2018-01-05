@@ -26,17 +26,17 @@ int getGraphDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
     int reqStrIndex = 1;
     int pwmStrIndex = 1;
     
+    
     int i = gWIndex;
     
-    for(;(i+1) % RING_BUFFER_SIZE
-	    != gWIndex; i = (i + 1) % RING_BUFFER_SIZE){
+    for(;(i+1) % RING_BUFFER_SIZE != gWIndex; i = (i + 1) % RING_BUFFER_SIZE){
 	
-	actStrIndex +=
-	    sprintf(&actPosBuff[actStrIndex], "%d,",gData[i].actPos);
-	reqStrIndex +=
-	    sprintf(&reqPosBuff[reqStrIndex], "%d,",gData[i].reqPos);
-	pwmStrIndex +=
-	    sprintf(&pwmDutyBuff[pwmStrIndex], "%d,",gData[i].pwmDuty);
+    	actStrIndex +=
+    			sprintf(&actPosBuff[actStrIndex], "%d,",gData[i].actPos);
+    	reqStrIndex +=
+    			sprintf(&reqPosBuff[reqStrIndex], "%d,",gData[i].reqPos);
+    	pwmStrIndex +=
+    			sprintf(&pwmDutyBuff[pwmStrIndex], "%d,",gData[i].pwmDuty);
     }
 
     actStrIndex +=

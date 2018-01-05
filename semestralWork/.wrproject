@@ -2547,6 +2547,14 @@
             <stringAttribute key="BLD::Info|Macro|LIBS|value|SIMLINUXdiab" value=""/>
             <listAttribute key="BLD::Info|Incl|SIMLINUXdiab">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/tcpServerTask/TCPInterface"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/udpClientTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/fifoBuffer"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/udpServerTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/motorWriterTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/motorReaderTask"/>
+                <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork/tcpServerTask"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Definess|SIMLINUXdiab">

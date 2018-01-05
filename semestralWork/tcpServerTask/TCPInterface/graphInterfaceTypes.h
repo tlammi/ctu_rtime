@@ -9,9 +9,9 @@
    \brief Structure for containing graph data
 */
 typedef struct{
-    int actPos; //! Actual motor position
-    int reqPos; //! Requested motor position
-    int pwmDuty; //! PWM duty cycle
+    int actPos; //!< Actual motor position
+    int reqPos; //!< Requested motor position
+    int pwmDuty; //!< PWM duty cycle
 } GraphData;
 
 
