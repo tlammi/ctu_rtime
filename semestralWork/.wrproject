@@ -6871,14 +6871,19 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="swMotorWriter" passed="false" targetname="swMotorWriter">
+        <buildtarget buildtool="Linker" name="motorReader" passed="false" targetname="motorReader">
             <contents>
-                <buildtargetreference name="/swMotorWriter/swMotorWriter_partialImage"/>
+                <file name="/semestralWork/readerBootstrapper.c"/>
+                <folder name="/semestralWork/udpClientTask" recursive="true"/>
+                <folder name="/semestralWork/motorReaderTask" recursive="true"/>
             </contents>
         </buildtarget>
-        <buildtarget buildtool="Partial Image Linker" name="swMotorWriter_partialImage" passed="true" targetname="swMotorWriter_partialImage">
+        <buildtarget buildtool="Linker" name="motorWriter" passed="false" targetname="motorWriter">
             <contents>
-                <folder name="/swMotorWriter" recursive="true"/>
+                <folder name="/semestralWork/motorWriterTask" recursive="true"/>
+                <file name="/semestralWork/writerBootstrapper.c"/>
+                <folder name="/semestralWork/tcpServerTask" recursive="true"/>
+                <folder name="/semestralWork/udpServerTask" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>
