@@ -2,61 +2,19 @@
 #include <taskLib.h>
 #include <stdint.h>
 
-// In hz
-#define PWM_FREQUENCY 20*1000
-// In Mhz
-#define PWM_CLOCK 100*1000*1000
-// Number of periods of PWM_CLOCK
-#define PWM_PERIOD (PWM_CLOCK) / (PWM_FREQUENCY)
+#include <xlnx_zynq7k.h>
 
-#define PMOD2_BASE_ADDRESS 0x43c30000
-#define CONTROL_REGISTER_OFFSET 0x0000
-#define PWM_ENABLE_BIT 6
-#define PWM_PERIOD_OFFSET 0x0008
-#define PWM_PERIOD_MASK 0x3FFFFFFF
-#define PWM_DUTY_CYCLE_OFFSET 0x000C
-#define PWM_DUTY_MASK 0x3FFFFFFF
-#define PWM_DUTY_DIR_A_BIT 30
-#define PWM_DUTY_DIR_B_BIT 31
+#include "motor/utils.h"
 
 int unsigned current_position;
 int unsigned desired_position = 50;
 
-void setPwmDutyCycle(int unsigned const duty_cycle) {
-	volatile uint32_t * duty_cycle_address = (volatile uint32_t *)(PMOD2_BASE_ADDRESS + PWM_DUTY_CYCLE_OFFSET);
-	*duty_cycle_address = ((*duty_cycle_address) & (~PWM_DUTY_MASK)) | (duty_cycle & PWM_DUTY_MASK);
-}
+volatile int irc_a, irc_b;
 
-void pwmInit() {
+// In hz
+#define PWM_FREQUENCY 20*1000
 
-	// Set PWM period
-	*(volatile uint32_t *)(PMOD2_BASE_ADDRESS + PWM_PERIOD_OFFSET) = PWM_PERIOD & PWM_PERIOD_MASK;
-	// Change direction of DUTY_DIR_B
-	*(volatile uint32_t *)(PMOD2_BASE_ADDRESS + PWM_DUTY_CYCLE_OFFSET) |= ((unsigned)1<<PWM_DUTY_DIR_B_BIT);
-	// Set duty cycle to 0
-	setPwmDutyCycle(0);
-	// Enable PWM
-	*(volatile uint8_t *)(PMOD2_BASE_ADDRESS + CONTROL_REGISTER_OFFSET) |= (1<<PWM_ENABLE_BIT);
-}
-
-void disablePwm() {
-	// Set PWM_ENABLE to 0
-	*(volatile uint8_t *)(PMOD2_BASE_ADDRESS + CONTROL_REGISTER_OFFSET) &= ~(1<<PWM_ENABLE_BIT);
-}
-
-void printStatus() {
-	int unsigned pwm_enabled = ((*(volatile uint8_t *)(PMOD2_BASE_ADDRESS + CONTROL_REGISTER_OFFSET) ) & (1<<PWM_ENABLE_BIT)) >> PWM_ENABLE_BIT;
-	int unsigned pwm_duty_cycle = (*(volatile uint32_t *) (PMOD2_BASE_ADDRESS + PWM_DUTY_CYCLE_OFFSET)) & PWM_DUTY_MASK;
-	int unsigned pwm_period = (*(volatile uint32_t *) (PMOD2_BASE_ADDRESS + PWM_PERIOD_OFFSET)) & PWM_PERIOD_MASK;
-	int unsigned pwm_duty_dir_a = ((*(volatile uint32_t *) (PMOD2_BASE_ADDRESS + PWM_DUTY_CYCLE_OFFSET)) & (((unsigned)1)<<PWM_DUTY_DIR_A_BIT)) >> PWM_DUTY_DIR_A_BIT;
-	int unsigned pwm_duty_dir_b = ((*(volatile uint32_t *) (PMOD2_BASE_ADDRESS + PWM_DUTY_CYCLE_OFFSET)) & (((unsigned)1)<<PWM_DUTY_DIR_B_BIT)) >> PWM_DUTY_DIR_B_BIT;
-
-	printf("pwm enabled: %d\n", pwm_enabled);
-	printf("pwm duty cycle: %d\n", pwm_duty_cycle);
-	printf("pwm_duty_dir_a: %d\n", pwm_duty_dir_a);
-	printf("pwm_duty_dir_b: %d\n", pwm_duty_dir_b);
-	printf("pwm period: %d\n", pwm_period);
-}
+SEM_ID sem_update_motor_position;
 
 int unsigned pidController() {
 	int unsigned u = 0;
@@ -74,23 +32,67 @@ void motorWriterTask() {
 	while(1) {
 		taskDelay(1);
 		int unsigned pid_output = pidController();
-		setPwmDutyCycle(pid_output);
+		pwm_setDutyCycle(pid_output);
 	}
 	
+}
+
+void irc_isr(void)
+{
+        int sr; /* status register */
+        sr = *(volatile uint32_t *) (0x43c30000 + 0x0004);
+        irc_a = (sr & 0x100) >> 8;
+        irc_b = (sr & 0x200) >> 9;
+        semGive(sem_update_motor_position);
+        *(volatile uint32_t *) (ZYNQ7K_GPIO_BASE + 0x00000298) = 0x4; /* reset (stat) */
+}
+
+void updateMotorPosition() {
+	struct motorSignals signals;
+	struct motorSignals signals_previous;
+	enum motorDirection motor_direction;
+        while (1) {
+                semTake(sem_update_motor_position, WAIT_FOREVER);
+                // printf("a: %d, b: %d\n", irc_a, irc_b);
+                signals.a = irc_a;
+                signals.b = irc_b;
+                motor_direction = findMotorDirection(&signals, &signals_previous);
+                // printf("Motor direction: %d\n", motor_direction);
+                signals_previous.a = signals.a;
+                signals_previous.b = signals.b;
+                
+                if ( motor_direction == DIRECTION_CW ) {
+                	incrementMotorPosition();
+                } else {
+                	decrementMotorPosition();
+                }
+                printf("Motor position: %d\n", current_position);
+        }
 }
 
 void startMotorWriter() {
 	printf("Starting motor writer task\n");
 	
 	pwmInit();
-	printStatus();
+	// pwm_printStatus();
+	
+	irc_init(irc_isr);
 	
 	TASK_ID motor_writer_task_id;
+    TASK_ID update_motor_position_task_id;
+    sem_update_motor_position = semCCreate(SEM_Q_FIFO, 0);
 	
-    motor_writer_task_id = taskSpawn("irc_st", 100, 0, 4096, (FUNCPTR) motorWriterTask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    motor_writer_task_id = taskSpawn("motorWriterTask", 100, 0, 4096, (FUNCPTR) motorWriterTask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    update_motor_position_task_id = taskSpawn("updateMotorPositionTask", 100, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+
 	
 	taskDelay(5*sysClkRateGet());
+	irc_disable(irc_isr);
 	disablePwm();
     taskDelete(motor_writer_task_id);
+    taskDelete(update_motor_position_task_id);
 	printf("Motor writer done\n");
 }
+
