@@ -28,7 +28,7 @@ static int init(){
 		goto error;
 	}
 
-	/* Configure server address */
+	// Configure server address 
 	my_name.sin_family = AF_INET;
 	my_name.sin_addr.s_addr = INADDR_ANY;
 	my_name.sin_port = htons(UDP_SERVER_PORT);
@@ -63,14 +63,16 @@ void udpServerTask(FifoHandl fifoHandl){
 	int val;
 
 	while(1){
-		
-		int n = recvfrom(sockfd, &val, sizeof(int), 0, (struct sockaddr*)&cli_name, &addrlen);
+
+	    int n;
+	    do{
+	        n = recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
 		if(n == -1){
-			perror("Error receiving");
+		    perror("Error receiving");
 		}
-		else{
-			fifo_push(fifoHandl, val);
-		}
+	    }while(n<sizeof(FIFO_DATA_TYPE));
+	    // Blocking push to fifo
+	    fifo_push(fifoHandl, ntohl(val));
 	}
 
 

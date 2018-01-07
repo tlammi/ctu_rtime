@@ -35,6 +35,8 @@
     "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
     "</body>"
 
+// This is basically the graph without the y-values. They
+// are inserted by graphInterface
 // Plotly.plot(<place holder>, <data>, <layout>)
 #define HTML_SCRIPT_FORMAT "<script>"			\
     "TESTER = document.getElementById('tester');"	\
@@ -148,7 +150,10 @@ error:
     return -1;
 }
 
-char gBuffer[256];
+
+// Message is stored in this. Buffer is rahter large so it's global
+static char sendBuffer[1024*10];
+
 int TCP_answerToClient(TCPHandle cliHandl){
 
     int i=0;
@@ -159,9 +164,6 @@ int TCP_answerToClient(TCPHandle cliHandl){
 
     // Import data from graphInterface
     getGraphDataStr(actPosBuff, reqPosBuff, pwmBuff);
-
-    // Message is stored in this
-    char sendBuffer[1024*10];
 
     // Construct message
     sprintf(sendBuffer, HTML_FORMAT, actPosBuff, reqPosBuff, pwmBuff);

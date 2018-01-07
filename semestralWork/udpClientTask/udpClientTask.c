@@ -57,7 +57,13 @@ void udpClientTask(FifoHandl fifoHandl){
 	int value = 0;
 	
 	while(1){
-		value = fifo_pop(fifoHandl);
-		int n = sendto(sockd, &value, sizeof(int), 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
+	    // Blocking call to buffer
+	    value = htonl(fifo_pop(fifoHandl));
+
+	    int n;
+	    // Send data until the send succeeds
+	    do{
+		n = sendto(sockd, &value, sizeof(FIFO_DATA_TYPE), 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
+	    }while( n < sizeof(FIFO_DATA_TYPE));
 	}
 }
