@@ -18,4 +18,5 @@ void writerBootstrap(){
 	
 	// Bootstrap all tasks
 	taskSpawn("UDP_server", 210, 0, 4096, (FUNCPTR) 	udpServerTask, motorHandl,0,0,0,0,0,0,0,0,0);
+	taskSpawn("TCP_server", 210, 0, 4096, (FUNCPTR) tcpServerTask, tcpHandl,0,0,0,0,0,0,0,0,0);
 }
