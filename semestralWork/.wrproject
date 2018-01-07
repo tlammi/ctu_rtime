@@ -791,6 +791,14 @@
             <stringAttribute key="BLD::Info|Macro|LIBS|value|ARMARCH7diab_SMP" value=""/>
             <listAttribute key="BLD::Info|Incl|ARMARCH7diab_SMP">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-I../tcpServerTask/TCPInterface"/>
+                <stringAttribute value="-I../motorReaderTask"/>
+                <stringAttribute value="-I../udpClientTask"/>
+                <stringAttribute value="-I../motorWriterTask"/>
+                <stringAttribute value="-I../tcpServerTask"/>
+                <stringAttribute value="-I.."/>
+                <stringAttribute value="-I../fifoBuffer"/>
+                <stringAttribute value="-I../udpServerTask"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/config/xlnx_zynq7k"/>
                 <stringAttribute value="-I/home/lammiton/WindRiver/workspace/semestral_work/semestralWork"/>
@@ -6890,19 +6898,59 @@
     </attributes>
     <buildtargets>
         <buildtarget buildtool="Linker" name="motorReader" passed="false" targetname="motorReader">
+            <attributes>
+                <mapAttribute>
+                    <listAttribute key="BLD::Info|Definess|ARMARCH7diab_SMP">
+                        <stringAttribute value="-DCPU=_VX_$(CPU)"/>
+                        <stringAttribute value="-DPMOD_BASE_ADDRESS=0x43c20000"/>
+                        <stringAttribute value="-DTOOL_FAMILY=$(TOOL_FAMILY)"/>
+                        <stringAttribute value="-DTOOL=$(TOOL)"/>
+                        <stringAttribute value="-D_WRS_KERNEL"/>
+                        <stringAttribute value="-D_WRS_VX_SMP"/>
+                        <stringAttribute value="-D_WRS_CONFIG_SMP"/>
+                        <stringAttribute value="-D_VSB_CONFIG_FILE=\&quot;$(VSB_DIR)/h/config/vsbConfig.h\&quot;"/>
+                        <stringAttribute value="-DARMEL -DARMEL "/>
+                        <stringAttribute value="-DARM_USE_VFP"/>
+                        <stringAttribute value="-DARM_USE_VFP"/>
+                        <stringAttribute value="-DIP_PORT_VXWORKS=69"/>
+                    </listAttribute>
+                </mapAttribute>
+            </attributes>
             <contents>
+                <folder name="/semestralWork/motor" recursive="true"/>
                 <file name="/semestralWork/readerBootstrapper.c"/>
                 <folder name="/semestralWork/udpClientTask" recursive="true"/>
                 <folder name="/semestralWork/motorReaderTask" recursive="true"/>
                 <folder name="/semestralWork/fifoBuffer" recursive="true"/>
+                <folder name="/semestralWork/mzapoBoard" recursive="true"/>
             </contents>
         </buildtarget>
         <buildtarget buildtool="Linker" name="motorWriter" passed="false" targetname="motorWriter">
+            <attributes>
+                <mapAttribute>
+                    <listAttribute key="BLD::Info|Definess|ARMARCH7diab_SMP">
+                        <stringAttribute value="-DCPU=_VX_$(CPU)"/>
+                        <stringAttribute value="-DPMOD_BASE_ADDRESS=0x43c30000"/>
+                        <stringAttribute value="-DTOOL_FAMILY=$(TOOL_FAMILY)"/>
+                        <stringAttribute value="-DTOOL=$(TOOL)"/>
+                        <stringAttribute value="-D_WRS_KERNEL"/>
+                        <stringAttribute value="-D_WRS_VX_SMP"/>
+                        <stringAttribute value="-D_WRS_CONFIG_SMP"/>
+                        <stringAttribute value="-D_VSB_CONFIG_FILE=\&quot;$(VSB_DIR)/h/config/vsbConfig.h\&quot;"/>
+                        <stringAttribute value="-DARMEL -DARMEL "/>
+                        <stringAttribute value="-DARM_USE_VFP"/>
+                        <stringAttribute value="-DARM_USE_VFP"/>
+                        <stringAttribute value="-DIP_PORT_VXWORKS=69"/>
+                    </listAttribute>
+                </mapAttribute>
+            </attributes>
             <contents>
                 <folder name="/semestralWork/motorWriterTask" recursive="true"/>
                 <file name="/semestralWork/writerBootstrapper.c"/>
                 <folder name="/semestralWork/tcpServerTask" recursive="true"/>
                 <folder name="/semestralWork/udpServerTask" recursive="true"/>
+                <folder name="/semestralWork/mzapoBoard" recursive="true"/>
+                <folder name="/semestralWork/motor" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>
