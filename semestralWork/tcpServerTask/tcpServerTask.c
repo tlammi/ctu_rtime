@@ -21,11 +21,8 @@ static void graphUpdaterTask(){
 
 void tcpServerTask(){
 	
-	// TODO: spawn the graphUpdaterTask
-	
 	srand(0);
 	
-
 	taskSpawn("graphUpdater", 210, 0, 4096, (FUNCPTR) 	graphUpdaterTask, 0,0,0,0,0,0,0,0,0,0);
 	
 	TCPHandle handl = TCP_init();
@@ -37,6 +34,7 @@ void tcpServerTask(){
 	
 	while(1){
 		cliHandl = TCP_listen(handl);
+		taskDelay(100);
 		if(cliHandl == -1){
 			perror("TCP_listen failed");
 		}
@@ -46,5 +44,6 @@ void tcpServerTask(){
 			}
 			
 		}
+		TCP_closeInterface(cliHandl);
 	}
 }
