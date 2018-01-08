@@ -16,9 +16,9 @@ static void graphUpdaterTask(FifoHandl fifoHandl){
 		
 		// Read data from buffer. This buffer call is blocking.
 		int actVal, reqVal, pwmVal;
-		fifo_pop(fifoHandl, &actVal);
-		fifo_pop(fifoHandl, &reqVal);
-		fifo_pop(fifoHandl, &pwmVal);
+		actVal = fifo_pop(fifoHandl);
+		reqVal = fifo_pop(fifoHandl);
+		pwmVal = fifo_pop(fifoHandl);
 		
 		GraphData data;
 		data.actPos = actVal;
