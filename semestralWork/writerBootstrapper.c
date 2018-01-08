@@ -2,6 +2,7 @@
 #include "tcpServerTask.h"
 #include "motorWriterTask.h"
 #include "fifoBuffer.h"
+#include "priorities.h"
 
 #include <taskLib.h>
 #include <kernelLib.h>
@@ -17,6 +18,6 @@ void writerBootstrap(){
 	init(&motorHandl, &tcpHandl);
 	
 	// Bootstrap all tasks
-	taskSpawn("UDP_server", 210, 0, 4096, (FUNCPTR) 	udpServerTask, motorHandl,0,0,0,0,0,0,0,0,0);
-	taskSpawn("TCP_server", 210, 0, 4096, (FUNCPTR) tcpServerTask, tcpHandl,0,0,0,0,0,0,0,0,0);
+	taskSpawn("UDP_server", PRIORITY_UDP_SERVER, 0, 4096, (FUNCPTR) udpServerTask, motorHandl,0,0,0,0,0,0,0,0,0);
+	taskSpawn("TCP_server", PRIORITY_TCP_SERVER, 0, 4096, (FUNCPTR) tcpServerTask, tcpHandl,0,0,0,0,0,0,0,0,0);
 }
