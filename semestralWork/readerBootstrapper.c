@@ -1,3 +1,10 @@
+/**
+ * \brief Entry point for the board that reads values from a motor
+ * 
+ * Functions defined here initialize and bootstrap the sytem.
+ * 
+ * \author Toni Lammi
+ */
 #include "udpClientTask.h"
 #include "motorReaderTask.h"
 #include "fifoBuffer.h"
@@ -7,6 +14,7 @@
 #include <kernelLib.h>
 #include <taskLib.h>
 
+//! Initialize system
 int init(FifoHandl* udpHandl){
     *udpHandl = fifo_init(FIFO_UDP_CLIENT);
     
@@ -14,6 +22,7 @@ int init(FifoHandl* udpHandl){
 }
 
 
+//! Bootstrap the tasks
 void readerBootstrap(){
     FifoHandl udpHandl;
 	int res = init(&udpHandl);

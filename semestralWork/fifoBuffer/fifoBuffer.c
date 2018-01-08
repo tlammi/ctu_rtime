@@ -3,17 +3,27 @@
 #include <stdlib.h>
 #include <semLib.h>
 
+/**
+ * \brief RingBuffer type used by interface
+ * 
+ */
 struct RingBuffer{
-	FIFO_DATA_TYPE data[FIFO_BUFF_SIZE];
-	size_t rIndex;
-	size_t wIndex;
+	FIFO_DATA_TYPE data[FIFO_BUFF_SIZE]; //!< Array for storing data
+	size_t rIndex; //!< Read index in buffer
+	size_t wIndex; //!< Write index in buffer
 	SEM_ID dSem; //!< Data in buffer
 	SEM_ID fSem; //!< Free space in buffer
 };
 
+//! Fifo buffers
 struct RingBuffer gRingBuffers[4];
 
 FifoHandl fifo_init(FifoID id){
+	if(id < 1 || id > 4){
+		printf("Invalid fifo ID\n");
+		goto error;
+	}
+	// Pointer to correct buffer
 	struct RingBuffer* ptr = &gRingBuffers[id-1];
 	
 	size_t i;
@@ -29,6 +39,9 @@ FifoHandl fifo_init(FifoID id){
 	ptr->fSem = semCCreate(SEM_Q_FIFO, FIFO_BUFF_SIZE);
 	
 	return (FifoHandl) ptr;
+	
+error:
+	return NULL;
 }
 
 
@@ -63,33 +76,41 @@ FIFO_DATA_TYPE fifo_pop(FifoHandl handl){
 }
 
 void fifo_push_nonblock(FifoHandl handl, FIFO_DATA_TYPE push, int* status){
-    	struct RingBuffer* ptr = (struct RingBuffer*) handl;
+	struct RingBuffer* ptr = (struct RingBuffer*) handl;
 
-	*status = -1;
+	if(status != NULL){
+		*status = -1;
+	}
 	// Decrement the free space by one
 	if(semTake(ptr->fSem, 0) == OK){
-	    
-	    ptr->data[ptr->wIndex] = push;
-	    ptr->wIndex = (ptr->wIndex + 1)% FIFO_BUFF_SIZE;
-	    // Increment data count by one
-	    semGive(ptr->dSem);
-	    *status = 0;
+
+		ptr->data[ptr->wIndex] = push;
+		ptr->wIndex = (ptr->wIndex + 1)% FIFO_BUFF_SIZE;
+		// Increment data count by one
+		semGive(ptr->dSem);
+		if(status != NULL){
+			*status = 0;
+		}
 	}
 }
 
 FIFO_DATA_TYPE fifo_pop_nonblock(FifoHandl handl, int* status){
-    struct RingBuffer* ptr = (struct RingBuffer*) handl;
+	struct RingBuffer* ptr = (struct RingBuffer*) handl;
 
-    FIFO_DATA_TYPE retVal = 0;
-    *status = -1;
+	FIFO_DATA_TYPE retVal = 0;
+	if(status != NULL){
+		*status = -1;
+	}
 
-    // Execute only if data left in buffer
-    if(semTake(ptr->dSem, 0) == OK){
-	retVal  = ptr->data[ptr->rIndex];
-	ptr->rIndex = (ptr->rIndex + 1)%FIFO_BUFF_SIZE;
-	*status = 0;
-	semGive(ptr->fSem);
-    }
+	// Execute only if data left in buffer
+	if(semTake(ptr->dSem, 0) == OK){
+		retVal  = ptr->data[ptr->rIndex];
+		ptr->rIndex = (ptr->rIndex + 1)%FIFO_BUFF_SIZE;
+		if(status != NULL){
+			*status = 0;
+		}
+		semGive(ptr->fSem);
+	}
 
     return retVal;
 }

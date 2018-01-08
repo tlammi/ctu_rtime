@@ -30,7 +30,7 @@
 #define GRAPH_HEIGHT_PX "500"
 // Place holder for the plot
 #define HTML_BODY "<body onload"				\
-    "=\"setInterval(function(){location.reload()}, 5000);\">"	\
+    "=\"setTimeout(function(){location.reload()}, 500);\">"	\
     "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX		\
     "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
     "</body>"
@@ -167,21 +167,29 @@ int TCP_answerToClient(TCPHandle cliHandl){
 
     // Construct message
     sprintf(sendBuffer, HTML_FORMAT, actPosBuff, reqPosBuff, pwmBuff);
-
-    // Send the data
+    
+    
+    // Read and send the data
     int toBeSent = strlen(sendBuffer);
     int strLen = toBeSent;
     int msgSize;
+    
+    char recvBuff[1000];
+    
+    msgSize = read(cliHandl, recvBuff, 1000);
+    printf("Received %d byte message: \n%s",msgSize,recvBuff);
+
     while(toBeSent > 0){
-	msgSize = write(cliHandl, sendBuffer,
-			strLen);
-	if(msgSize >= 0){
-	    toBeSent -= msgSize;
-	}
-	else{
-	    printf("TCP error: write returned %d",msgSize);
-	    return -1;
-	}
+    	msgSize = write(cliHandl, sendBuffer,
+    			toBeSent);
+
+    	if(msgSize >= 0){
+    		toBeSent -= msgSize;
+    	}
+    	else{
+    		printf("TCP error: write returned %d",msgSize);
+    		return -1;
+    	}
     }
 
     return 0;
