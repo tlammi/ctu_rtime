@@ -76,33 +76,41 @@ FIFO_DATA_TYPE fifo_pop(FifoHandl handl){
 }
 
 void fifo_push_nonblock(FifoHandl handl, FIFO_DATA_TYPE push, int* status){
-    	struct RingBuffer* ptr = (struct RingBuffer*) handl;
+	struct RingBuffer* ptr = (struct RingBuffer*) handl;
 
-	*status = -1;
+	if(status != NULL){
+		*status = -1;
+	}
 	// Decrement the free space by one
 	if(semTake(ptr->fSem, 0) == OK){
-	    
-	    ptr->data[ptr->wIndex] = push;
-	    ptr->wIndex = (ptr->wIndex + 1)% FIFO_BUFF_SIZE;
-	    // Increment data count by one
-	    semGive(ptr->dSem);
-	    *status = 0;
+
+		ptr->data[ptr->wIndex] = push;
+		ptr->wIndex = (ptr->wIndex + 1)% FIFO_BUFF_SIZE;
+		// Increment data count by one
+		semGive(ptr->dSem);
+		if(status != NULL){
+			*status = 0;
+		}
 	}
 }
 
 FIFO_DATA_TYPE fifo_pop_nonblock(FifoHandl handl, int* status){
-    struct RingBuffer* ptr = (struct RingBuffer*) handl;
+	struct RingBuffer* ptr = (struct RingBuffer*) handl;
 
-    FIFO_DATA_TYPE retVal = 0;
-    *status = -1;
+	FIFO_DATA_TYPE retVal = 0;
+	if(status != NULL){
+		*status = -1;
+	}
 
-    // Execute only if data left in buffer
-    if(semTake(ptr->dSem, 0) == OK){
-	retVal  = ptr->data[ptr->rIndex];
-	ptr->rIndex = (ptr->rIndex + 1)%FIFO_BUFF_SIZE;
-	*status = 0;
-	semGive(ptr->fSem);
-    }
+	// Execute only if data left in buffer
+	if(semTake(ptr->dSem, 0) == OK){
+		retVal  = ptr->data[ptr->rIndex];
+		ptr->rIndex = (ptr->rIndex + 1)%FIFO_BUFF_SIZE;
+		if(status != NULL){
+			*status = 0;
+		}
+		semGive(ptr->fSem);
+	}
 
     return retVal;
 }
