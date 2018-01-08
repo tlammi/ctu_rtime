@@ -1,3 +1,12 @@
+/**
+ * \brief Entry point for the board that controls a motor
+ * 
+ * Functions here initialize and bootstrap the system.
+ * 
+ * \author Toni Lammi
+ */
+
+
 #include "udpServerTask.h"
 #include "tcpServerTask.h"
 #include "motorWriterTask.h"
@@ -8,11 +17,13 @@
 #include <kernelLib.h>
 
 
+//! Initialize system
 void init(FifoHandl* motorHandl, FifoHandl* tcpHandl){
 	*motorHandl = fifo_init(FIFO_MOTOR_WRITER);
 	*tcpHandl = fifo_init(FIFO_TCP_SERVER);
 }
 
+//! Bootstrap the tasks
 void writerBootstrap(){
 	FifoHandl motorHandl, tcpHandl;
 	init(&motorHandl, &tcpHandl);

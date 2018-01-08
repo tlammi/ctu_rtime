@@ -1,5 +1,10 @@
 /**
  * \brief FIFO interface for inter task communication
+ * 
+ * fifo_init function initilializes the interface and returns a handle to
+ * initialized interface. Same handle can then be used for accessing the fifo buffers.
+ * 
+ * \author Toni Lammi
  */
 
 #ifndef FIFOBUFFER_H

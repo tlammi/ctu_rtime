@@ -3,17 +3,27 @@
 #include <stdlib.h>
 #include <semLib.h>
 
+/**
+ * \brief RingBuffer type used by interface
+ * 
+ */
 struct RingBuffer{
-	FIFO_DATA_TYPE data[FIFO_BUFF_SIZE];
-	size_t rIndex;
-	size_t wIndex;
+	FIFO_DATA_TYPE data[FIFO_BUFF_SIZE]; //!< Array for storing data
+	size_t rIndex; //!< Read index in buffer
+	size_t wIndex; //!< Write index in buffer
 	SEM_ID dSem; //!< Data in buffer
 	SEM_ID fSem; //!< Free space in buffer
 };
 
+//! Fifo buffers
 struct RingBuffer gRingBuffers[4];
 
 FifoHandl fifo_init(FifoID id){
+	if(id < 1 || id > 4){
+		printf("Invalid fifo ID\n");
+		goto error;
+	}
+	// Pointer to correct buffer
 	struct RingBuffer* ptr = &gRingBuffers[id-1];
 	
 	size_t i;
@@ -29,6 +39,9 @@ FifoHandl fifo_init(FifoID id){
 	ptr->fSem = semCCreate(SEM_Q_FIFO, FIFO_BUFF_SIZE);
 	
 	return (FifoHandl) ptr;
+	
+error:
+	return NULL;
 }
 
 

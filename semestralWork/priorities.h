@@ -1,5 +1,5 @@
 /**
- * \brief Task properties
+ * \brief Task priorities
  */
 
 #ifndef PRIORITIES_H
