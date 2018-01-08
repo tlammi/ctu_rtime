@@ -18,6 +18,7 @@ void writerBootstrap(){
 	init(&motorHandl, &tcpHandl);
 	
 	// Bootstrap all tasks
+	taskSpawn("motorWriter", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) startMotorWriter, motorHandl,0,0,0,0,0,0,0,0,0);
 	taskSpawn("UDP_server", PRIORITY_UDP_SERVER, 0, 4096, (FUNCPTR) udpServerTask, motorHandl,0,0,0,0,0,0,0,0,0);
 	taskSpawn("TCP_server", PRIORITY_TCP_SERVER, 0, 4096, (FUNCPTR) tcpServerTask, tcpHandl,0,0,0,0,0,0,0,0,0);
 }
