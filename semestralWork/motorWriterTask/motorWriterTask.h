@@ -1,3 +1,4 @@
 
+#include "fifoBuffer.h"
 
-void startMotorWriter();
+void startMotorWriter(FifoHandl motorWriterHandl, FifoHandl tcpHandl);

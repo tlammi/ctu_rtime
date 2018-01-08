@@ -1,2 +1,2 @@
 
-void startMotorReader();
+void startMotorReader(FifoHandl updHandl);

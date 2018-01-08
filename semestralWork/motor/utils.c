@@ -36,3 +36,14 @@ enum motorDirection findMotorDirection(struct motorSignals const * const current
 	}
 }
 
+void incrementMotorPosition(int unsigned * motor_position) {
+	*motor_position = (*motor_position + 1) % MOTOR_POSITION_MAX;
+}
+
+void decrementMotorPosition(int unsigned * motor_position) {
+	if (*motor_position == 0) {
+		*motor_position = MOTOR_POSITION_MAX - 1;
+	} else {
+		--(*motor_position);
+	}
+}

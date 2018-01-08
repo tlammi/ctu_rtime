@@ -30,7 +30,7 @@ void readerBootstrap(){
 	    perror("reader init");
 	}
 	else{
-	    startMotorReader();
+	    startMotorReader(udpHandl);
 	    taskSpawn("UDP_client", PRIORITY_UDP_CLIENT, 0, 4096, (FUNCPTR) udpClientTask, udpHandl,0,0,0,0,0,0,0,0,0);
 	    
 	}

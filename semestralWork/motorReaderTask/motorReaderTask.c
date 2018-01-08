@@ -12,22 +12,14 @@
 #include "mzapoBoard/irc.h"
 
 #include "motor/utils.h"
+#include "priorities.h"
+#include "fifoBuffer.h"
 
 SEM_ID irc_sem;
 volatile int irc_a, irc_b;
-int unsigned motor_position;
+volatile int unsigned motor_position;
+FifoHandl g_udpHandl;
 
-void incrementMotorPosition() {
-	motor_position = (motor_position + 1) % MOTOR_POSITION_MAX;
-}
-
-void decrementMotorPosition() {
-	if (motor_position == 0) {
-		motor_position = 99;
-	} else {
-		--motor_position;
-	}
-}
 
 void updateMotorPosition(void)
 {
@@ -45,9 +37,9 @@ void updateMotorPosition(void)
                 signals_previous.b = signals.b;
                 
                 if ( motor_direction == DIRECTION_CW ) {
-                	incrementMotorPosition();
+                	incrementMotorPosition(&motor_position);
                 } else {
-                	decrementMotorPosition();
+                	decrementMotorPosition(&motor_position);
                 }
                 printf("Motor position: %d\n", motor_position);
         }
@@ -56,28 +48,38 @@ void updateMotorPosition(void)
 void irc_isr(void)
 {
         int sr; /* status register */
-        sr = *(volatile uint32_t *) (0x43c20000 + 0x0004);
+        sr = *(volatile uint32_t *) (PMOD_BASE_ADDRESS + 0x0004);
         irc_a = (sr & 0x100) >> 8;
         irc_b = (sr & 0x200) >> 9;
         semGive(irc_sem);
         *(volatile uint32_t *) (ZYNQ7K_GPIO_BASE + 0x00000298) = 0x4; /* reset (stat) */
 }
 
+void sendMotorPosition() {
+	while(1) {
+		taskDelay(sysClkRateGet() / 10);
+		fifo_push_nonblock(g_udpHandl, motor_position, NULL);
+	}
+}
 
-void startMotorReader(void)
+void startMotorReader(FifoHandl udpHandl)
 {
-        TASK_ID st;
+		g_udpHandl = udpHandl;
+        TASK_ID st, send_motor_position_task_id;
 
         irc_init(irc_isr);
         irc_sem = semCCreate(SEM_Q_FIFO, 0);
-        st = taskSpawn("irc_st", 100, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        printf("All is ready.\n");
+        st = taskSpawn("irc_st", PRIORITY_MOTOR_READER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        send_motor_position_task_id = taskSpawn("sendMotorPositionTask", PRIORITY_MOTOR_READER, 0, 4096, (FUNCPTR) sendMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-        taskDelay(1000);
+        printf("Motor reader starting.\n");
+
+        taskDelay(60*sysClkRateGet());
         printf("Out of play time.\n");
 
         irc_disable(irc_isr);
         taskDelete(st);
+        taskDelete(send_motor_position_task_id);
         
         printf("Motor reader done\n");
 }

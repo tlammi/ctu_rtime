@@ -1,5 +1,8 @@
 
 #include <stdint.h>
+#include <intLib.h>
+#include <iv.h>
+#include <kernelLib.h>
 #include <xlnx_zynq7k.h>
 
 /*

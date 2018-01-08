@@ -67,6 +67,7 @@ void udpServerTask(FifoHandl fifoHandl){
 	    int n;
 	    do{
 	        n = recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
+	        printf("Received: %d\n", val);
 		if(n == -1){
 		    perror("Error receiving");
 		}

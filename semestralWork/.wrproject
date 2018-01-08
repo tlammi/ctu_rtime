@@ -6930,7 +6930,7 @@
                 <mapAttribute>
                     <listAttribute key="BLD::Info|Definess|ARMARCH7diab_SMP">
                         <stringAttribute value="-DCPU=_VX_$(CPU)"/>
-                        <stringAttribute value="-DPMOD_BASE_ADDRESS=0x43c30000"/>
+                        <stringAttribute value="-DPMOD_BASE_ADDRESS=0x43c20000"/>
                         <stringAttribute value="-DTOOL_FAMILY=$(TOOL_FAMILY)"/>
                         <stringAttribute value="-DTOOL=$(TOOL)"/>
                         <stringAttribute value="-D_WRS_KERNEL"/>
@@ -6945,12 +6945,13 @@
                 </mapAttribute>
             </attributes>
             <contents>
+                <folder name="/semestralWork/motor" recursive="true"/>
+                <folder name="/semestralWork/mzapoBoard" recursive="true"/>
                 <folder name="/semestralWork/motorWriterTask" recursive="true"/>
                 <file name="/semestralWork/writerBootstrapper.c"/>
                 <folder name="/semestralWork/tcpServerTask" recursive="true"/>
                 <folder name="/semestralWork/udpServerTask" recursive="true"/>
-                <folder name="/semestralWork/mzapoBoard" recursive="true"/>
-                <folder name="/semestralWork/motor" recursive="true"/>
+                <folder name="/semestralWork/fifoBuffer" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>
