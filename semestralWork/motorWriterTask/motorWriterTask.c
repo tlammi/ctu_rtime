@@ -19,6 +19,7 @@ FifoHandl g_tcpHandl;
 
 
 volatile int irc_a, irc_b;
+volatile int irc_ba, old_irc_ba;
 
 // In hz
 #define PWM_FREQUENCY (20*1000)
@@ -46,7 +47,7 @@ int unsigned pidController() {
 	// static int current_index;
 	// static int e_array[PID_BUF_SIZE];
 	int u = 0;
-	int const P = 100;
+	int const P = 300;
 	int const I = 1;
 	int const I_div = 1;
 	// int const e = (int)desired_position - (int)current_position;
@@ -82,7 +83,7 @@ int unsigned pidController() {
 	printf("u: %u\n",u );
 	*/
 	printf("%u\n", g_current_position);
-	return u / 100;
+	return u / 100 > 200 ? 200 : u / 100;
 }
 
 void motorWriterTask() {
@@ -97,13 +98,28 @@ void motorWriterTask() {
 	
 }
 
+
+static const int g_lookup_table[4][4] = {{0, 1, 0, 0},{0, 0, 0, 1},{1, 0, 0, 0},{0, 0, 1, 0}};
+//! 2 bit gray to binary
+inline int isCW(int gray, int oldGray){
+	return g_lookup_table[gray][oldGray];
+}
+
 void irc_isr(void)
 {
         int sr; /* status register */
         sr = *(volatile uint32_t *) (PMOD_BASE_ADDRESS + 0x0004);
-        irc_a = (sr & 0x100) >> 8;
-        irc_b = (sr & 0x200) >> 9;
-        semGive(sem_update_motor_position);
+        //irc_a = (sr & 0x100) >> 8;
+        //irc_b = (sr & 0x200) >> 9;
+        irc_ba = (sr & 0x300) >> 8;
+        if(isCW(irc_ba, old_irc_ba)){
+        	g_current_position = (unsigned)(g_current_position - 1) > MOTOR_POSITION_MAX ? MOTOR_POSITION_MAX : g_current_position - 1;
+        }
+        else{
+        	g_current_position = (g_current_position + 1) > MOTOR_POSITION_MAX ? 0 : g_current_position + 1;
+        }
+        old_irc_ba = irc_ba;
+        //semGive(sem_update_motor_position);
         *(volatile uint32_t *) (ZYNQ7K_GPIO_BASE + 0x00000298) = 0x4; /* reset (stat) */
 }
 
@@ -174,7 +190,7 @@ void startMotorWriter(FifoHandl motorWriterHandl, FifoHandl tcpHandl) {
     sem_update_motor_position = semCCreate(SEM_Q_FIFO, 0);
 	
     motor_writer_task_id = taskSpawn("motorWriterTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) motorWriterTask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    update_motor_position_task_id = taskSpawn("updateMotorPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    //update_motor_position_task_id = taskSpawn("updateMotorPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     update_desired_position_task_id = taskSpawn("updateDesiredPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateDesiredPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	send_data_to_tcp_buffer_task_id = taskSpawn("sendDataToTcpBufferTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) sendDataToTcpBuffer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     

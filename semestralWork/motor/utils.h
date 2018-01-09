@@ -1,5 +1,5 @@
 
-#define MOTOR_POSITION_MAX 500
+#define MOTOR_POSITION_MAX 10000
 
 struct motorSignals {
 	int a;
