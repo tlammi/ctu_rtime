@@ -133,6 +133,7 @@ void updateMotorPosition() {
 
 void updateDesiredPosition() {
 	desired_position = fifo_pop(g_motorWriterHandl);
+	printf("Writer read %d from buffer\n",desired_position);
 }
 
 void sendDataToTcpBuffer() {

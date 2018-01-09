@@ -30,7 +30,7 @@ static int init(){
 
 	// Configure server address 
 	my_name.sin_family = AF_INET;
-	my_name.sin_addr.s_addr = INADDR_ANY;
+	inet_aton(UDP_SERVER_ADDR, my_name.sin_addr.s_addr);
 	my_name.sin_port = htons(UDP_SERVER_PORT);
 
 	status = bind(sockfd, (struct sockaddr*)&my_name, sizeof(my_name));
@@ -64,18 +64,16 @@ void udpServerTask(FifoHandl fifoHandl){
 
 	while(1){
 
-	    int n;
+	    int n=0;
 	    do{
-	        n = recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
+	        n += recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
 	        printf("Received: %d\n", val);
 		if(n == -1){
 		    perror("Error receiving");
 		}
 	    }while(n<sizeof(FIFO_DATA_TYPE));
+	    printf("Read %d from UDP\n",val);
 	    // Blocking push to fifo
 	    fifo_push(fifoHandl, ntohl(val));
 	}
-
-
-	
 }

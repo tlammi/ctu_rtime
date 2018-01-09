@@ -59,10 +59,12 @@ void udpClientTask(FifoHandl fifoHandl){
 	while(1){
 	    // Blocking call to buffer
 	    value = htonl(fifo_pop(fifoHandl));
+	    printf("UDP client read %d from buffer\n",value);
 
 	    int n;
 	    // Send data until the send succeeds
 	    do{
+		printf("sending to server.\n");
 		n = sendto(sockd, &value, sizeof(FIFO_DATA_TYPE), 0,(struct sockaddr*)&srv_addr, sizeof(srv_addr));
 	    }while( n < sizeof(FIFO_DATA_TYPE));
 	}

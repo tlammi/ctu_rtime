@@ -58,6 +58,7 @@ void irc_isr(void)
 void sendMotorPosition() {
 	while(1) {
 		taskDelay(sysClkRateGet() / 10);
+		printf("Read data to buffer: %d\n",motor_position);
 		fifo_push_nonblock(g_udpHandl, motor_position, NULL);
 	}
 }
