@@ -10,6 +10,7 @@
 #ifndef FIFOBUFFER_H
 #define FIFOBUFFER_H
 
+//! Has to be multiple of 3 due to TCP server
 #define FIFO_BUFF_SIZE 128
 #define FIFO_DATA_TYPE int
 

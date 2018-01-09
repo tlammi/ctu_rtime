@@ -27,17 +27,19 @@ static int init(){
 		perror("Socket creation error");
 		goto error;
 	}
+	printf("sockfd: %d\n",sockfd);
 
 	// Configure server address 
 	my_name.sin_family = AF_INET;
-	inet_aton(UDP_SERVER_ADDR, my_name.sin_addr.s_addr);
+	inet_aton(UDP_SERVER_ADDR, &my_name.sin_addr.s_addr);
 	my_name.sin_port = htons(UDP_SERVER_PORT);
-
+	printf("UDP server binding.\n");
 	status = bind(sockfd, (struct sockaddr*)&my_name, sizeof(my_name));
 	if(status == -1){
 		perror("bind");
 		goto error;
 	}
+	printf("successful bind\n");
 
 	return sockfd;
 
@@ -47,7 +49,9 @@ static int init(){
 
 void udpServerTask(FifoHandl fifoHandl){
 	
+	printf("before init/n");
 	int sockfd = init();
+	printf("after init. got: %d\n",sockfd);
 	
 	while(sockfd == -1){
 		perror("UDP server fail");
@@ -64,16 +68,13 @@ void udpServerTask(FifoHandl fifoHandl){
 
 	while(1){
 
-	    int n=0;
-	    do{
-	        n += recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
-	        printf("Received: %d\n", val);
+		int n = recvfrom(sockfd, &val, sizeof(FIFO_DATA_TYPE), 0, (struct sockaddr*)&cli_name, &addrlen);
 		if(n == -1){
-		    perror("Error receiving");
+			perror("Error receiving");
 		}
-	    }while(n<sizeof(FIFO_DATA_TYPE));
-	    printf("Read %d from UDP\n",val);
-	    // Blocking push to fifo
-	    fifo_push(fifoHandl, ntohl(val));
+		if(n == 4){
+			// Blocking push to fifo
+			fifo_push(fifoHandl, val);
+		}
 	}
 }

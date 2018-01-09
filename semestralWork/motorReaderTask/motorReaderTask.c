@@ -57,8 +57,8 @@ void irc_isr(void)
 
 void sendMotorPosition() {
 	while(1) {
-		taskDelay(sysClkRateGet() / 10);
-		printf("Read data to buffer: %d\n",motor_position);
+		taskDelay(sysClkRateGet()/5);
+		//printf("Read data to buffer: %d\n",motor_position);
 		fifo_push_nonblock(g_udpHandl, motor_position, NULL);
 	}
 }
@@ -71,10 +71,11 @@ void startMotorReader(FifoHandl udpHandl)
         irc_init(irc_isr);
         irc_sem = semCCreate(SEM_Q_FIFO, 0);
         st = taskSpawn("irc_st", PRIORITY_MOTOR_READER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        send_motor_position_task_id = taskSpawn("sendMotorPositionTask", PRIORITY_MOTOR_READER, 0, 4096, (FUNCPTR) sendMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        send_motor_position_task_id = taskSpawn("sendMotorPositionTask", PRIORITY_MOTOR_READER+1, 0, 4096, (FUNCPTR) sendMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         printf("Motor reader starting.\n");
 
+        /*
         taskDelay(60*sysClkRateGet());
         printf("Out of play time.\n");
 
@@ -83,5 +84,7 @@ void startMotorReader(FifoHandl udpHandl)
         taskDelete(send_motor_position_task_id);
         
         printf("Motor reader done\n");
+        
+        */
 }
 

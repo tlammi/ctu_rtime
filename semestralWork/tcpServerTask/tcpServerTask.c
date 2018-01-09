@@ -34,7 +34,7 @@ void tcpServerTask(FifoHandl fifoHandl){
 	
 	// Spawn a task for reading fifo buffer with data coming from motor writer.
 	// Priority is higher than that of server tasks
-	taskSpawn("graphUpdater", PRIORITY_TCP_SERVER-1, 0, 4096, (FUNCPTR) 	graphUpdaterTask, fifoHandl,0,0,0,0,0,0,0,0,0);
+	//taskSpawn("graphUpdater", PRIORITY_TCP_SERVER-1, 0, 4096, (FUNCPTR) graphUpdaterTask, fifoHandl,0,0,0,0,0,0,0,0,0);
 	
 	// Initialize TCP server socket
 	TCPHandle handl = TCP_init();

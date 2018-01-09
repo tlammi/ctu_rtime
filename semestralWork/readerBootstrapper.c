@@ -30,8 +30,11 @@ void readerBootstrap(){
 	    perror("reader init");
 	}
 	else{
-	    startMotorReader(udpHandl);
+	    taskSpawn("motorReaderStarter", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) startMotorReader, udpHandl,0,0,0,0,0,0,0,0,0);
 	    taskSpawn("UDP_client", PRIORITY_UDP_CLIENT, 0, 4096, (FUNCPTR) udpClientTask, udpHandl,0,0,0,0,0,0,0,0,0);
 	    
+	    // Delay for a while and then exit (for debugging)
+	    //taskDelay(60*sysClkRateGet());
+
 	}
 }
