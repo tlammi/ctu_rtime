@@ -43,9 +43,9 @@ int getGraphDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
     actStrIndex +=
 	sprintf(&actPosBuff[actStrIndex], "%d]",gData[i].actPos);
     reqStrIndex +=
-	sprintf(&reqPosBuff[reqStrIndex], "%d]",gData[i].actPos);
+	sprintf(&reqPosBuff[reqStrIndex], "%d]",gData[i].reqPos);
     pwmStrIndex +=
-	sprintf(&pwmDutyBuff[pwmStrIndex], "%d]",gData[i].actPos);
+	sprintf(&pwmDutyBuff[pwmStrIndex], "%d]",gData[i].pwmDuty);
 
 
     return 0;
