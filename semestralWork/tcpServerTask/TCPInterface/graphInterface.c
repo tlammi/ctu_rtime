@@ -5,7 +5,7 @@
 #include <string.h>
 
 // Buffer size, has to be multiple of 2
-#define RING_BUFFER_SIZE 8
+#define RING_BUFFER_SIZE 9
 
 // Ring buffer for containing data
 static GraphData gData[RING_BUFFER_SIZE];
