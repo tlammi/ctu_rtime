@@ -12,6 +12,46 @@ unsigned int grayToBinary(unsigned int num)
     return num;
 }
 
+inline enum motorDirection findDirection(int a, int b, int a_prev, int b_prev) {
+	if ((b && !a_prev) ||
+		(!a && !b_prev) ||
+		(!b && a_prev) ||
+		(a && b_prev)
+	) {
+		return DIRECTION_CCW;
+	} else {
+		return DIRECTION_CW;
+	}
+}
+
+inline void motor_updatePosition(int * motor_position, int a, int b, int a_prev, int b_prev){
+	struct motorSignals signals;
+	struct motorSignals signals_previous;
+	enum motorDirection motor_direction;
+    // while (1) {
+                // semTake(irc_sem, WAIT_FOREVER);
+                // printf("a: %d, b: %d\n", irc_a, irc_b);
+                /*
+                signals.a = irc_a;
+                signals.b = irc_b;
+                motor_direction = findMotorDirection(&signals, &signals_previous);
+                // printf("Motor direction: %d\n", motor_direction);
+                signals_previous.a = signals.a;
+                signals_previous.b = signals.b;
+                */
+                motor_direction = findDirection(a, b, a_prev, b_prev);
+                // a_prev = a;
+                // b_prev = b;
+                if ( motor_direction == DIRECTION_CW ) {
+                	incrementMotorPosition(motor_position);
+                } else {
+                	decrementMotorPosition(motor_position);
+                }
+                // printf("Motor position: %d\n", motor_position);
+        // }
+}
+
+/*
 enum motorDirection findMotorDirection(struct motorSignals const * const current,
 		struct motorSignals const * const previous) {
 	
@@ -35,12 +75,12 @@ enum motorDirection findMotorDirection(struct motorSignals const * const current
 		return DIRECTION_CCW;
 	}
 }
-
-void incrementMotorPosition(int unsigned * motor_position) {
+*/
+inline void incrementMotorPosition(int unsigned * motor_position) {
 	*motor_position = (*motor_position + 1) % MOTOR_POSITION_MAX;
 }
 
-void decrementMotorPosition(int unsigned * motor_position) {
+inline void decrementMotorPosition(int unsigned * motor_position) {
 	if (*motor_position == 0) {
 		*motor_position = MOTOR_POSITION_MAX - 1;
 	} else {
