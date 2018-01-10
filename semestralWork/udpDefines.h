@@ -1,3 +1,8 @@
+/**
+ * \brief Contains defines common for both UDP tasks
+ * 
+ * \author Toni Lammi
+ */
 #ifndef UDPDEFINES_H
 #define UDPDEFINES_H
 

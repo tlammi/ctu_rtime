@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Buffer size, has to be multiple of 2
+// Buffer size
 #define RING_BUFFER_SIZE 9
 
 // Ring buffer for containing data
@@ -39,6 +39,7 @@ int getGraphDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
     			sprintf(&pwmDutyBuff[pwmStrIndex], "%d,",gData[i].pwmDuty);
     }
 
+    // Update all string indexes
     actStrIndex +=
 	sprintf(&actPosBuff[actStrIndex], "%d]",gData[i].actPos);
     reqStrIndex +=

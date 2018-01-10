@@ -1,5 +1,7 @@
 /**
    \brief Contains definitions of public types in graph interface
+   
+   \author Toni Lammi
 */
 
 #ifndef GRAPHINTERFACETYPES_H

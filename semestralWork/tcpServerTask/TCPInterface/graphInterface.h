@@ -3,6 +3,8 @@
 
    Data is stored in ring buffer and oldest
    value is dropped once newer value is added
+   
+   \author Toni Lammi
 */
 #ifndef GRAPHINTERFACE_H
 #define GRAPHINTERFACE_H

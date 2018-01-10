@@ -19,6 +19,7 @@
 
 //! Initialize system
 void init(FifoHandl* motorHandl, FifoHandl* tcpHandl){
+	// Handles to fifo interfaces
 	*motorHandl = fifo_init(FIFO_MOTOR_WRITER);
 	*tcpHandl = fifo_init(FIFO_TCP_SERVER);
 }
@@ -27,10 +28,6 @@ void init(FifoHandl* motorHandl, FifoHandl* tcpHandl){
 void writerBootstrap(){
 	FifoHandl motorHandl, tcpHandl;
 	init(&motorHandl, &tcpHandl);
-	
-	TASK_ID motor_writer_task_id;
-	TASK_ID udp_server_task_id;
-	TASK_ID tcp_server_task_id;
 	
 	// Bootstrap all tasks
 	taskSpawn("motorWriter", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) startMotorWriter, motorHandl,tcpHandl,0,0,0,0,0,0,0,0);
