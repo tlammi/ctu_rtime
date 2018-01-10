@@ -19,12 +19,14 @@ struct RingBuffer{
 struct RingBuffer gRingBuffers[4];
 
 FifoHandl fifo_init(FifoID id){
+
+	// Pointer to correct buffer
+	struct RingBuffer* ptr = &gRingBuffers[id-1];
+
 	if(id < 1 || id > 4){
 		printf("Invalid fifo ID\n");
 		goto error;
 	}
-	// Pointer to correct buffer
-	struct RingBuffer* ptr = &gRingBuffers[id-1];
 	
 	size_t i;
 	
