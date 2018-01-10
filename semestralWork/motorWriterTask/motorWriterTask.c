@@ -33,7 +33,7 @@ int unsigned abs(int a) {
 }
 */	
 
-int calculatePositionDifference(int desired_position, int current_position) {
+int64_t calculatePositionDifference(int desired_position, int current_position) {
 	/*
 	int val1 = desired_position - (current_position - MOTOR_POSITION_MAX);
 	int val2 = desired_position - current_position;
@@ -43,10 +43,10 @@ int calculatePositionDifference(int desired_position, int current_position) {
 		return val1;
 	}
 	*/
-	int e = desired_position - current_position;
-	if ( e > MOTOR_POSITION_MAX/2) {
+	int64_t e = desired_position - current_position;
+	if ( e > MOTOR_POSITION_MAX/2 ) {
 		e = e - MOTOR_POSITION_MAX;
-	} else if ( e < -MOTOR_POSITION_MAX/2) {
+	} else if ( e < -MOTOR_POSITION_MAX/2 ) {
 		e = e + MOTOR_POSITION_MAX;
 	}
 	return e;
@@ -55,16 +55,16 @@ int calculatePositionDifference(int desired_position, int current_position) {
 int unsigned pidController() {
 	// static int current_index;
 	// static int e_array[PID_BUF_SIZE];
-	int u = 0;
+	int64_t u = 0;
 	int const P = 200;
 	int const I = 1;
 	int const I_div = 1;
 	// int const e = (int)desired_position - (int)current_position;
-	int const e = calculatePositionDifference(g_desired_position, g_current_position);
+	int64_t const e = calculatePositionDifference(g_desired_position, g_current_position);
 	g_e = e;
 	static int e_prev;
 	// printf("Position difference: %d\n", e);
-	static int e_int;
+	static int64_t e_int;
 	e_int += (I * e)/I_div;
 	// printf("error: %d\n", e);
 	
@@ -91,6 +91,7 @@ int unsigned pidController() {
 	if ( abs(e) < 10 ) {
 		u = 0;
 	}
+	
 	if (u > 25000) {
 		u = 25000;
 	}
@@ -136,7 +137,17 @@ void irc_isr(void)
         g_irc_a = (sr & 0x100) >> 8;
         g_irc_b = (sr & 0x200) >> 9;
         
-        motor_updatePosition(&g_current_position, g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev);
+        // motor_updatePosition(&g_current_position, g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev);
+        
+    	if ((g_irc_b && !g_irc_a_prev) ||
+    		(!g_irc_a && !g_irc_b_prev) ||
+    		(!g_irc_b && g_irc_a_prev) ||
+    		(g_irc_a && g_irc_b_prev)
+    	) {
+    		++g_current_position;
+    	} else {
+    		--g_current_position;
+    	}
         
         g_irc_a_prev = g_irc_a;
         g_irc_b_prev = g_irc_b;
@@ -186,9 +197,11 @@ void updateDesiredPosition() {
 void sendDataToTcpBuffer() {
 	while(1){
 		taskDelay(sysClkRateGet() / 2);
+		/*
 		printf("Motor position: %d\n", g_current_position);
 		printf("Desired position: %d\n", g_desired_position);
 		printf("e: %d\n", g_e);
+		*/
 		pwm_printStatus();
 		/*
 		fifo_push_nonblock(g_tcpHandl, g_current_position, NULL);
