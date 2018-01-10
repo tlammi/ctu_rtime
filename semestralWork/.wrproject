@@ -825,8 +825,8 @@
             </listAttribute>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|derivedSigs|ARMARCH7diab_SMP" value="*.o"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|dbgFlags|ARMARCH7diab_SMP" value="-g"/>
-            <stringAttribute key="BLD::Info|Tool|C-Compiler|nonDbgFlags|ARMARCH7diab_SMP" value=" -XO -Xsize-opt "/>
-            <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|ARMARCH7diab_SMP" value="$(CC_ARCH_SPEC) -W:c:,-Xclib-optim-off -W:c++:,-Xclib-optim-off -Xansi -Xlocal-data-area-static-only  -W:c++:.CPP -Xfp-fast  -Xc-new -Xdialect-c89  -ei1518,4177,4223,4301,4550,5409,1606 -ei4193,4826,4381,4237,1573,4007,4082,4177,4223,4260,4550,5361,5828,2273,5387,5388 -ei1522,4092,4111,4152,4167,4171,4174,4186,4188,4191,4192,4223,4231,4236,4284,4375,4494,4513,5152,5457 -Xforce-declarations   -Xmake-dependency=0xd"/>
+            <stringAttribute key="BLD::Info|Tool|C-Compiler|nonDbgFlags|ARMARCH7diab_SMP" value="-XO -Xwhole-program-optim -O -Xwhole-program-optim=0x00"/>
+            <stringAttribute key="BLD::Info|Tool|C-Compiler|flags|ARMARCH7diab_SMP" value="$(CC_ARCH_SPEC) -W:c:,-Xclib-optim-off -W:c++:,-Xclib-optim-off -Xansi -Xlocal-data-area-static-only  -W:c++:.CPP -Xfp-fast  -Xc-new -Xdialect-c89  -ei1518,4177,4223,4301,4550,5409,1606 -ei4193,4826,4381,4237,1573,4007,4082,4177,4223,4260,4550,5361,5828,2273,5387,5388 -ei1522,4092,4111,4152,4167,4171,4174,4186,4188,4191,4192,4223,4231,4236,4284,4375,4494,4513,5152,5457 -Xforce-declarations   -Xmake-dependency=0xd -O -XO -Xwhole-program-optim=0x00"/>
             <stringAttribute key="BLD::Info|Tool|C-Compiler|cmd|ARMARCH7diab_SMP" value="echo &quot;building $@&quot;;%ccompilerprefix% $(TOOL_PATH)dcc %DebugModeFlags% %ToolFlags% %Defines% $(DEFINES) $(ADDED_CFLAGS) %Includes% $(ADDED_INCLUDES) -o %OutFile% -c %InFile%"/>
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|derivedSigs|ARMARCH7diab_SMP" value="*.o"/>
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|dbgFlags|ARMARCH7diab_SMP" value="-g"/>

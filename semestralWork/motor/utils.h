@@ -1,5 +1,7 @@
 
-#define MOTOR_POSITION_MAX 500
+#ifndef _MOTOR_UTILS_H_
+#define _MOTOR_UTILS_H_
+#define MOTOR_POSITION_MAX 5000
 
 struct motorSignals {
 	int a;
@@ -13,6 +15,11 @@ enum motorDirection {
 
 unsigned int grayToBinary(unsigned int num);
 
-void incrementMotorPosition(int unsigned * motor_position);
+inline void incrementMotorPosition(int unsigned * motor_position);
 
-void decrementMotorPosition(int unsigned * motor_position);
+inline void decrementMotorPosition(int unsigned * motor_position);
+
+inline void motor_updatePosition(int * motor_position, int a, int b, int a_prev, int b_prev);
+
+
+#endif // _MOTOR_UTILS_H_

@@ -26,6 +26,7 @@ void init(FifoHandl* motorHandl, FifoHandl* tcpHandl){
 
 //! Bootstrap the tasks
 void writerBootstrap(){
+	sysClkRateSet(5000);
 	FifoHandl motorHandl, tcpHandl;
 	init(&motorHandl, &tcpHandl);
 	
