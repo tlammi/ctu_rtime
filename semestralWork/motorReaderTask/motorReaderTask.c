@@ -17,7 +17,7 @@
 
 SEM_ID irc_sem;
 volatile int g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev;
-volatile int unsigned g_motor_position;
+volatile int unsigned g_motor_position = MOTOR_POSITION_MAX / 2;
 FifoHandl g_udpHandl;
 
 
@@ -54,8 +54,38 @@ void irc_isr(void)
     g_irc_a = (sr & 0x100) >> 8;
     g_irc_b = (sr & 0x200) >> 9;
     
-    motor_updatePosition(&g_motor_position, g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev);
+    // motor_updatePosition(&g_current_position, g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev);
     
+    int unsigned motor_direction = (g_irc_a << 3) +
+    		(g_irc_b << 2) +
+    		(g_irc_a_prev << 1) +
+    		(g_irc_b_prev << 0);
+    
+    switch (motor_direction) {
+    	case 1:
+    	case 7:
+    	case 8:
+    	case 14:
+    		--g_motor_position;
+    		break;
+    	case 2:
+    	case 4:
+    	case 11:
+    	case 13:
+    		++g_motor_position;
+    		break;
+    }
+    /*
+	if ((g_irc_b && !g_irc_a_prev) ||
+		(!g_irc_a && !g_irc_b_prev) ||
+		(!g_irc_b && g_irc_a_prev) ||
+		(g_irc_a && g_irc_b_prev)
+	) {
+		++g_current_position;
+	} else {
+		--g_current_position;
+	}
+    */
     g_irc_a_prev = g_irc_a;
     g_irc_b_prev = g_irc_b;
     *(volatile uint32_t *) (ZYNQ7K_GPIO_BASE + 0x00000298) = 0x4; /* reset (stat) */
@@ -63,7 +93,7 @@ void irc_isr(void)
 
 void sendMotorPosition() {
 	while(1) {
-		taskDelay(sysClkRateGet()/5);
+		taskDelay(sysClkRateGet()/100);
 		//printf("Read data to buffer: %d\n",g_motor_position);
 		fifo_push_nonblock(g_udpHandl, g_motor_position, NULL);
 	}
