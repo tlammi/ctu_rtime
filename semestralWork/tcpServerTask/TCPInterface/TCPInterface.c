@@ -28,68 +28,96 @@
 
 #define GRAPH_WIDTH_PX "1000"
 #define GRAPH_HEIGHT_PX "500"
-// Place holder for the plot
-#define HTML_BODY "<body onload"				\
-    "=\"setTimeout(function(){location.reload()}, 500);\">"	\
-    "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX		\
-    "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
-    "</body>"
+
+
 
 // This is basically the graph without the y-values. They
 // are inserted by graphInterface
 // Plotly.plot(<place holder>, <data>, <layout>)
-#define HTML_SCRIPT_FORMAT "<script>"			\
-    "TESTER = document.getElementById('tester');"	\
-    "var trace1 = {"					\
+#define HTML_SCRIPT_FORMAT "<script defer>"			\
+	"var TESTER = document.getElementById('tester');"	\
+	"var pwm_plot_element = document.getElementById('pwmplot');"	\
+	"var trace1 = {"					\
     "x: [-2.00, -1.75, -1.50, -1.25, -1.00,"		\
     "-0.75, -0.50, -0.25, 0.00],"			\
-    "y: %s,"						\
+    "y: [%s],"						\
     "name: 'Actual Motor Position',"			\
     "type: 'scatter'"					\
     "};"						\
     "var trace2 = {"					\
     "x: [-2.00, -1.75, -1.50, -1.25, -1.00,"		\
     "-0.75, -0.50, -0.25, 0.00],"			\
-    "y: %s,"						\
+    "y: [%s],"						\
     "name: 'Required Motor Position',"			\
     "type: 'scatter'"					\
     "};"						\
     "var trace3 = {"					\
     "x: [-2.00, -1.75, -1.50, -1.25, -1.00,"		\
     "-0.75, -0.50, -0.25, 0.00],"			\
-    "y: %s,"						\
+    "y: [%s],"						\
     "name: 'PWM Duty Cycle',"				\
     "type: 'scatter'"					\
-    "};"						\
-    "var data = [trace1, trace2, trace3];"		\
+    "};"	\
+    "var data = [trace1, trace2];"		\
     "var layout = {"					\
-    "title: 'System Information',"			\
-    "xaxis: {"						\
-    "title: 'x Axis',"					\
-    "titlefont: {"					\
-    "family: 'Courier New, monospace',"			\
-    "size: 18,"						\
-    "color: '#7f7f7f'"					\
-    "}"							\
-    "},"						\
-    "yaxis: {"						\
-    "title: 'y Axis',"					\
-    "titlefont: {"					\
-    "family: 'Courier New, monospace',"			\
-    "size: 18,"						\
-    "color: '#7f7f7f'"					\
-    "}"							\
-    "}"							\
+		"title: 'Position Information',"			\
+		"xaxis: {"						\
+			"title: 'time [s]',"					\
+			"titlefont: {"					\
+				"family: 'Courier New, monospace',"			\
+				"size: 18,"						\
+				"color: '#7f7f7f'"					\
+				"}"							\
+		"},"						\
+		"yaxis: {"						\
+			"title: 'Position',"					\
+			"titlefont: {"					\
+				"family: 'Courier New, monospace',"			\
+				"size: 18,"						\
+				"color: '#7f7f7f'"					\
+			"}"							\
+		"}"							\
     "};"						\
-    "Plotly.plot(TESTER, data, layout)"			\
+    "var pwm_plot_layout = {"	\
+		"title: 'Pwm duty cycle',"	\
+		"xaxis: {"						\
+			"title: 'time [s]',"					\
+			"titlefont: {"					\
+				"family: 'Courier New, monospace',"			\
+				"size: 18,"						\
+				"color: '#7f7f7f'"					\
+			"}"							\
+		"},"						\
+		"yaxis: {"						\
+			"title: 'Duty cycle [\%]',"					\
+			"titlefont: {"					\
+				"family: 'Courier New, monospace',"			\
+				"size: 18,"						\
+				"color: '#7f7f7f'"					\
+			"}"							\
+		"}"		\
+	"};"	\
+    "Plotly.plot(TESTER, data, layout);"			\
+    "Plotly.plot(pwm_plot_element, [trace3], pwm_plot_layout);"	\
     "</script>"
+// Place holder for the plot
+#define HTML_BODY "<body " \
+    "onload=\"setTimeout(function(){location.reload()}, 500);\""	\
+    ">"	\
+    "<div id=\"tester\" style=\"width:" GRAPH_WIDTH_PX		\
+    "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
+	"<div id=\"pwmplot\" style=\"width:" GRAPH_WIDTH_PX		\
+    "px;height:"GRAPH_HEIGHT_PX"px;\"></div>"			\
+    HTML_SCRIPT_FORMAT \
+    "</body>"
+
 
 //! Full HTML string format
 const char* HTML_FORMAT = HTTP_HEADER
     "<!DOCTYPE html>""<html>"
     HTML_HEAD
     HTML_BODY
-    HTML_SCRIPT_FORMAT
+    // HTML_SCRIPT_FORMAT
     "</html>\r\n\r\n";
 
 
