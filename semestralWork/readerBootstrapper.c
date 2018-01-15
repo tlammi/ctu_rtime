@@ -18,7 +18,7 @@
 int init(FifoHandl* udpHandl){
 	// Handle to fifo interface
     *udpHandl = fifo_init(FIFO_UDP_CLIENT);
-    
+    sysClkRateSet(5000);
     return 0;
 }
 

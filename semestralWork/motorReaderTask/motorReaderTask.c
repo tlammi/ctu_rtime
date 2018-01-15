@@ -79,7 +79,7 @@ void startMotorReader(FifoHandl udpHandl)
         // st = taskSpawn("irc_st", PRIORITY_MOTOR_READER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         send_motor_position_task_id = taskSpawn("sendMotorPositionTask", PRIORITY_MOTOR_READER+1, 0, 4096, (FUNCPTR) sendMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-        printf("Motor reader starting.\n");
+        //printf("Motor reader starting.\n");
 
         /*
         taskDelay(60*sysClkRateGet());
