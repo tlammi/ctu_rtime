@@ -11,10 +11,12 @@
 #include "fifoBuffer.h"
 #include "TCPInterface.h" //!< For updating values in webpage
 
-volatile int unsigned g_current_position;
-volatile int unsigned g_desired_position = 250;
+#define ABS(A) (((A) > 0) ? (A) : (-(A)))
+
+volatile int unsigned g_current_position = MOTOR_POSITION_MAX / 2;
+volatile int unsigned g_desired_position = MOTOR_POSITION_MAX / 2;
 volatile int unsigned g_pwm_duty_cycle;
-volatile int g_e;
+volatile int64_t g_e;
 FifoHandl g_motorWriterHandl;
 FifoHandl g_tcpHandl;
 
@@ -53,68 +55,43 @@ int64_t calculatePositionDifference(int desired_position, int current_position) 
 }
 
 int unsigned pidController() {
-	// static int current_index;
-	// static int e_array[PID_BUF_SIZE];
 	int64_t u = 0;
-	int const P = 200;
+	int const P = 0;
 	int const I = 1;
-	int const I_div = 1;
-	// int const e = (int)desired_position - (int)current_position;
+	int const I_div = 10;
 	int64_t const e = calculatePositionDifference(g_desired_position, g_current_position);
 	g_e = e;
-	static int e_prev;
-	// printf("Position difference: %d\n", e);
 	static int64_t e_int;
-	e_int += (I * e)/I_div;
-	// printf("error: %d\n", e);
+	e_int += (I * e);
 	
-	if ( e < 0 ) {
-		pwm_setPolarity(-1);
+	if ( e < 0LL ) {
+		pwm_setPolarity(1);
 	} else {
-		pwm_setPolarity(1);
-	}
-	
-	/*
-	if ( e < 0 && e_prev > 0) {
 		pwm_setPolarity(-1);
-	} else if (e > 0 && e_prev < 0) {
-		pwm_setPolarity(1);
 	}
-	*/
-	e_prev = e;
 	
-	// e_array[current_index] = e;
-	// current_index = (current_index + 1) % PID_BUF_SIZE;
-	u = P * e + e_int;
-	u = abs(u);
-	
-	if ( abs(e) < 10 ) {
+	if ( ABS(e) < 10 ) {
 		u = 0;
+		e_int = 0;
+	} else {
+		u = P * e + e_int / I_div;
+		// Absolute value of u
+		u = u > 0 ? u : -u;
+		// Scale to avoid too high pwm
+		u /= 1;
+		// Set a cap on pwm speed to avoid problems
+		int unsigned const u_max = 500;
+		if (u > u_max) {
+			u = u_max;
+		}
 	}
-	
-	if (u > 25000) {
-		u = 25000;
-	}
-	
-	/*
-	int i;
-	for (i = 0; i < PID_BUF_SIZE; ++i) {
-		u += I * e_array[i];
-	}
-	*/
-	/*
-	printf("e: %d\n", e);
-	printf("Current position: %u\n", current_position);
-	printf("u: %u\n",u );
-	*/
-	// printf("%u\n", g_current_position);
-	return u / 100;
+	return (int unsigned)u;
 }
 
 void motorWriterTask() {
 
 	while(1) {
-		taskDelay(sysClkRateGet() / 1000);
+		taskDelay(sysClkRateGet() / 500);
 		int unsigned pid_output = pidController();
 		// printf("set duty cycle: %u\n", pid_output);
 		g_pwm_duty_cycle = pid_output; // Update pwn duty cycle for TCP server
@@ -139,6 +116,26 @@ void irc_isr(void)
         
         // motor_updatePosition(&g_current_position, g_irc_a, g_irc_b, g_irc_a_prev, g_irc_b_prev);
         
+        int unsigned motor_direction = (g_irc_a << 3) +
+        		(g_irc_b << 2) +
+        		(g_irc_a_prev << 1) +
+        		(g_irc_b_prev << 0);
+        
+        switch (motor_direction) {
+        	case 1:
+        	case 7:
+        	case 8:
+        	case 14:
+        		--g_current_position;
+        		break;
+        	case 2:
+        	case 4:
+        	case 11:
+        	case 13:
+        		++g_current_position;
+        		break;
+        }
+        /*
     	if ((g_irc_b && !g_irc_a_prev) ||
     		(!g_irc_a && !g_irc_b_prev) ||
     		(!g_irc_b && g_irc_a_prev) ||
@@ -148,7 +145,7 @@ void irc_isr(void)
     	} else {
     		--g_current_position;
     	}
-        
+        */
         g_irc_a_prev = g_irc_a;
         g_irc_b_prev = g_irc_b;
         *(volatile uint32_t *) (ZYNQ7K_GPIO_BASE + 0x00000298) = 0x4; /* reset (stat) */
@@ -190,19 +187,27 @@ void updateDesiredPosition() {
 	while(1){
 		// This function call blocks until data available
 		g_desired_position = fifo_pop(g_motorWriterHandl);
+		GraphData data;
+		data.actPos = g_current_position;
+		data.reqPos = g_desired_position;
+		data.pwmDuty = g_pwm_duty_cycle;
+		
+		TCP_pushGraphData(data);
 		//printf("Writer read %d from buffer\n",g_desired_position);
 	}
 }
 
 void sendDataToTcpBuffer() {
 	while(1){
-		taskDelay(sysClkRateGet() / 2);
+		taskDelay(sysClkRateGet() / 100);
 		/*
-		printf("Motor position: %d\n", g_current_position);
-		printf("Desired position: %d\n", g_desired_position);
-		printf("e: %d\n", g_e);
-		*/
+		printf("Motor position:\t%u\n", g_current_position);
+		printf("Desired position:\t%u\n", g_desired_position);
+		printf("PWM duty cycle:\t%u\n", g_pwm_duty_cycle);
+		
+		printf("e: %lld\n", g_e);
 		pwm_printStatus();
+		*/
 		/*
 		fifo_push_nonblock(g_tcpHandl, g_current_position, NULL);
 		fifo_push_nonblock(g_tcpHandl, g_desired_position, NULL);
@@ -235,7 +240,7 @@ void startMotorWriter(FifoHandl motorWriterHandl, FifoHandl tcpHandl) {
     motor_writer_task_id = taskSpawn("motorWriterTask", PRIORITY_MOTOR_WRITER-1, 0, 4096, (FUNCPTR) motorWriterTask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     // update_motor_position_task_id = taskSpawn("updateMotorPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     update_desired_position_task_id = taskSpawn("updateDesiredPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateDesiredPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	send_data_to_tcp_buffer_task_id = taskSpawn("sendDataToTcpBufferTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) sendDataToTcpBuffer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	// send_data_to_tcp_buffer_task_id = taskSpawn("sendDataToTcpBufferTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) sendDataToTcpBuffer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     
     printf("Starting motor writer task\n");
 

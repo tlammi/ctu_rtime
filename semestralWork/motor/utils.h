@@ -2,7 +2,8 @@
 #ifndef _MOTOR_UTILS_H_
 #define _MOTOR_UTILS_H_
 #include "stdint.h"
-#define MOTOR_POSITION_MAX 0xFFFFFFFFU
+#include "limits.h"
+#define MOTOR_POSITION_MAX INT_MAX
 // #define MOTOR_POSITION_MAX 500
 
 struct motorSignals {

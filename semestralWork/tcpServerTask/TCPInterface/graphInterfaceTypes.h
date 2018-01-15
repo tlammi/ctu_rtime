@@ -11,9 +11,9 @@
    \brief Structure for containing graph data
 */
 typedef struct{
-    int actPos; //!< Actual motor position
-    int reqPos; //!< Requested motor position
-    int pwmDuty; //!< PWM duty cycle
+    int unsigned actPos; //!< Actual motor position
+    int unsigned reqPos; //!< Requested motor position
+    int unsigned pwmDuty; //!< PWM duty cycle
 } GraphData;
 
 
