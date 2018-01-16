@@ -31,7 +31,7 @@ int getGraphDataStr(char* actPosBuff, char* reqPosBuff, char* pwmDutyBuff){
     int actStrIndex = 0;
     int reqStrIndex = 0;
     int pwmStrIndex = 0;
-	
+    
     int i = gWIndex;
     
     for(;(i+1) % RING_BUFFER_SIZE != gWIndex; i = (i + 1) % RING_BUFFER_SIZE){

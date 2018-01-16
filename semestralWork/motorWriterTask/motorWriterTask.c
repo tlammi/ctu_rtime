@@ -187,19 +187,14 @@ void updateDesiredPosition() {
 	while(1){
 		// This function call blocks until data available
 		g_desired_position = fifo_pop(g_motorWriterHandl);
-		GraphData data;
-		data.actPos = g_current_position;
-		data.reqPos = g_desired_position;
-		data.pwmDuty = g_pwm_duty_cycle;
-		
-		TCP_pushGraphData(data);
 		//printf("Writer read %d from buffer\n",g_desired_position);
 	}
 }
 
 void sendDataToTcpBuffer() {
 	while(1){
-		taskDelay(sysClkRateGet() / 100);
+		taskDelay(sysClkRateGet()/2);
+		printf("exec\n ");
 		/*
 		printf("Motor position:\t%u\n", g_current_position);
 		printf("Desired position:\t%u\n", g_desired_position);
@@ -240,7 +235,7 @@ void startMotorWriter(FifoHandl motorWriterHandl, FifoHandl tcpHandl) {
     motor_writer_task_id = taskSpawn("motorWriterTask", PRIORITY_MOTOR_WRITER-1, 0, 4096, (FUNCPTR) motorWriterTask, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     // update_motor_position_task_id = taskSpawn("updateMotorPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateMotorPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     update_desired_position_task_id = taskSpawn("updateDesiredPositionTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) updateDesiredPosition, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	// send_data_to_tcp_buffer_task_id = taskSpawn("sendDataToTcpBufferTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) sendDataToTcpBuffer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	send_data_to_tcp_buffer_task_id = taskSpawn("sendDataToTcpBufferTask", PRIORITY_MOTOR_WRITER, 0, 4096, (FUNCPTR) sendDataToTcpBuffer, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     
     printf("Starting motor writer task\n");
 
